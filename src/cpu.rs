@@ -71,21 +71,39 @@ impl Cpu {
 
         //Only for debug purposes.
 
-        // if 0x015d == self.pc {
-        //   println!("");
-        //   println!("self.pc: {:#04x}", self.pc);
-        //   println!("");
-        //   println!("instruction: {:#04x}", instruction);
-        //   println!(" ");
-        //   let nn = (self.bus.load(self.current_pc + 2) as u16) << 8 | self.bus.load(self.current_pc + 1) as u16;
-        //   println!("nn: {:x}", nn);
-        //   println!(" ");
-        //   let n = self.bus.load(self.current_pc + 1);
-        //   println!("n: {:x}", n);
-        //   println!(" ");
+          println!("");
+          println!("self.pc: {:#04x}", self.pc);
+          println!("");
+          println!("instruction: {:#04x}", instruction);
+          println!(" ");
+          let nn = (self.bus.load(self.current_pc + 2) as u16) << 8 | self.bus.load(self.current_pc + 1) as u16;
+          println!("nn: {:x}", nn);
+          println!(" ");
+          let n = self.bus.load(self.current_pc + 1);
+          println!("n: {:x}", n);
+          println!(" ");
+
+          println!("self.sp: {:x}", self.sp);
+          println!(" ");
+
+          println!("self.register.flag.z: {:x}", self.register.flag.z);
+          println!("self.register.flag.n: {:x}", self.register.flag.n);
+          println!("self.register.flag.h: {:x}", self.register.flag.h);
+          println!("self.register.flag.c: {:x}", self.register.flag.c);
+          println!(" ");
+
+          println!("self.register.af: {:x}", self.register.af());
+          println!(" ");
+
+          println!("self.register.bc: {:x}", self.register.bc());
+          println!(" ");
+
+          println!("self.register.de: {:x}", self.register.de());
+          println!(" ");
+
+          println!("self.register.hl: {:x}", self.register.hl());
+          println!(" ");
           
-        //   panic!("!!!!!!!!");
-        // }
 
         self.pc = self.pc.wrapping_add(1);
 
@@ -138,8 +156,6 @@ impl Cpu {
         let nn = (self.bus.load(self.current_pc + 2) as u16) << 8 | self.bus.load(self.current_pc + 1) as u16;
         let n = self.bus.load(self.current_pc + 1);
 
-        println!("nn: {:x}", nn);
-
         match instruction {
             0x00 => self.bus.add_to_clock(4),
             0x01 => {
@@ -177,6 +193,7 @@ impl Cpu {
             0x06 => {
               self.register.b = n;
               self.bus.add_to_clock(8);
+              self.pc = self.pc.wrapping_add(1);
             }
             0x07 => {
               //TODO: Probably incorrect rotate_left value. Maybe we need use << operator.
@@ -243,6 +260,7 @@ impl Cpu {
             0x0E => {
               self.register.c = n;
               self.bus.add_to_clock(8);
+              self.pc = self.pc.wrapping_add(1);
             }
             0x0F => {
               //TODO: Probably incorrect rotate_right value. Maybe we need use >> operator.
@@ -357,11 +375,13 @@ impl Cpu {
               if self.register.flag.z == 0 {
                 self.pc = self.pc.wrapping_add(n as u16);
               }
+              self.pc = self.pc.wrapping_add(1);
               self.bus.add_to_clock(8);
             }
             0x21 => {
               self.register.set_hl(nn);
               self.bus.add_to_clock(12);
+              self.pc = self.pc.wrapping_add(2);
             }
             0x23 => {
               let value = self.bus.load(self.register.hl()).wrapping_add(1);
@@ -451,7 +471,6 @@ impl Cpu {
             }
             0x32 => {
               self.bus.store(self.register.hl(), self.register.a.wrapping_sub(1));
-
               self.bus.add_to_clock(8);
             }
             0x33 => {

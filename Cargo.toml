@@ -5,3 +5,5 @@ authors = ["Vitaly Shvetsov <nosferatu2995@mail.ru>"]
 
 [dependencies]
 sdl2 = "0.31.0"
+nom = "^1.2.3"
+clap = "2.31.2"
