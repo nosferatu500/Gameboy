@@ -251,6 +251,33 @@ impl Bus {
                 0xFF20 => {
                     return self.sound_channel_4.length as u8;
                 }
+                0xFF40 => {
+                    let window_tile = match self.gui.window_tile_map {
+                        0x9800 => 0b0,
+                        0x9C00 => 0b1,
+                        _ => unreachable!(),
+                    };
+
+                    let bg_window_tile = match self.gui.bg_window_tile_map {
+                        0x8800 => 0b0,
+                        0x8000 => 0b1,
+                        _ => unreachable!(),
+                    };
+
+                    let bg_tile = match self.gui.window_tile_map {
+                        0x9800 => 0b0,
+                        0x9C00 => 0b1,
+                        _ => unreachable!(),
+                    };
+
+                    let obj_size = match self.gui.sprite_size {
+                        MIN_SPRITE_SIZE => 0b0,
+                        MAX_SPRITE_SIZE => 0b1,
+                        _ => unreachable!(),
+                    };
+
+                    return (self.gui.lcd_display as u8) << 7 | window_tile << 6 | (self.gui.window_display as u8) << 5 | bg_window_tile << 4 | bg_tile << 3 | obj_size << 2 | (self.gui.sprite_display as u8) << 1 | self.gui.bg_display as u8;
+                }
                 0xFF42 => {
                     return self.gui.scroll_y;
                 }
@@ -559,6 +586,14 @@ impl Bus {
                     self.gui.bg_display = value & 0b1 == 1;
 
                     return;
+                }
+                0xFF41 => {
+                  self.gui.lyc = (value >> 6) & 0b1;
+
+                  self.gui.mode2 = (value >> 5) & 0b1;
+                  self.gui.mode1 = (value >> 4) & 0b1;
+                  self.gui.mode0 = (value >> 3) & 0b1;
+                  return;
                 }
                 0xFF42 => {
                     self.gui.scroll_y = value;

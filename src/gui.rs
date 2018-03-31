@@ -46,6 +46,10 @@ pub struct Gui {
 
     pub window_y: u8,
     pub window_x: u8,
+
+    pub mode2: u8,
+    pub mode1: u8,
+    pub mode0: u8,
 }
 
 impl Gui {
@@ -84,6 +88,10 @@ impl Gui {
 
             window_y: 0,
             window_x: 0,
+
+            mode2: 0,
+            mode1: 0,
+            mode0: 0,
         }
     }
 

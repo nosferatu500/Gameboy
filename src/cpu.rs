@@ -71,7 +71,7 @@ impl Cpu {
 
         //Only for debug purposes.
 
-        // if 0x0151 == self.pc {
+        // if 0x015d == self.pc {
         //   println!("");
         //   println!("self.pc: {:#04x}", self.pc);
         //   println!("");
@@ -79,6 +79,9 @@ impl Cpu {
         //   println!(" ");
         //   let nn = (self.bus.load(self.current_pc + 2) as u16) << 8 | self.bus.load(self.current_pc + 1) as u16;
         //   println!("nn: {:x}", nn);
+        //   println!(" ");
+        //   let n = self.bus.load(self.current_pc + 1);
+        //   println!("n: {:x}", n);
         //   println!(" ");
           
         //   panic!("!!!!!!!!");
@@ -133,7 +136,7 @@ impl Cpu {
 
     fn decode(&mut self, instruction: u8) {
         let nn = (self.bus.load(self.current_pc + 2) as u16) << 8 | self.bus.load(self.current_pc + 1) as u16;
-        let n = self.bus.load(self.current_pc);
+        let n = self.bus.load(self.current_pc + 1);
 
         println!("nn: {:x}", nn);
 
@@ -208,6 +211,8 @@ impl Cpu {
               self.register.a = value;
 
               self.bus.add_to_clock(8);
+
+              self.pc = self.pc.wrapping_add(2);
             }
             0x0B => {
               let mut value = self.bus.load(self.register.bc());
@@ -304,6 +309,8 @@ impl Cpu {
               self.register.a = value;
 
               self.bus.add_to_clock(8);
+
+              self.pc = self.pc.wrapping_add(2);
             }
             0x1B => {
               let mut value = self.bus.load(self.register.de());
@@ -494,11 +501,11 @@ impl Cpu {
               self.bus.add_to_clock(4);
             }
             0x3E => {
-              let value = self.bus.load(self.current_pc);
-
-              self.register.a = value;
+              self.register.a = n;
 
               self.bus.add_to_clock(8);
+
+              self.pc = self.pc.wrapping_add(2);
             }
             0x40 => {
                 self.bus.add_to_clock(4);
@@ -717,30 +724,37 @@ impl Cpu {
             0x78 => {
                 self.register.a = self.register.b;
                 self.bus.add_to_clock(4);
+                self.pc = self.pc.wrapping_add(2);
             }
             0x79 => {
                 self.register.a = self.register.c;
                 self.bus.add_to_clock(4);
+                self.pc = self.pc.wrapping_add(2);
             }
             0x7A => {
                 self.register.a = self.register.d;
                 self.bus.add_to_clock(4);
+                self.pc = self.pc.wrapping_add(2);
             }
             0x7B => {
                 self.register.a = self.register.e;
                 self.bus.add_to_clock(4);
+                self.pc = self.pc.wrapping_add(2);
             }
             0x7C => {
                 self.register.a = self.register.h;
                 self.bus.add_to_clock(4);
+                self.pc = self.pc.wrapping_add(2);
             }
             0x7D => {
                 self.register.a = self.register.l;
                 self.bus.add_to_clock(4);
+                self.pc = self.pc.wrapping_add(2);
             }
             0x7E => {
                 self.register.a = self.bus.load(self.register.hl());
                 self.bus.add_to_clock(8);
+                self.pc = self.pc.wrapping_add(2);
             }
             0x7F => {
                 self.bus.add_to_clock(4);
@@ -928,6 +942,12 @@ impl Cpu {
               
               self.bus.add_to_clock(12);
             }
+            0xCD => {
+              let addr = self.pc;
+              self.push_stack(addr);
+              self.pc = nn;
+              self.bus.add_to_clock(12);
+            }
             0xCE => {
               self.register.a = self.register.a.wrapping_add(self.bus.load(self.current_pc)).wrapping_add(self.register.flag.c);
               
@@ -952,6 +972,12 @@ impl Cpu {
               
               self.bus.add_to_clock(12);
             }
+            0xE0 => {
+              self.bus.store(0xFF00 + n as u16, self.register.a);
+              self.bus.add_to_clock(12);
+
+              self.pc = self.pc.wrapping_add(1);
+            }
             0xE2 => {
               self.bus.store(0xFF00 + self.register.c as u16, self.register.a);
               self.bus.add_to_clock(8);
@@ -970,6 +996,12 @@ impl Cpu {
 
               self.bus.add_to_clock(8);
             }
+            0xF0 => {
+              self.register.a = self.bus.load(0xFF00 + n as u16);
+              self.bus.add_to_clock(12);
+
+              self.pc = self.pc.wrapping_add(1);
+            }
             0xF2 => {
               let value = self.bus.load(0xFF00 + self.register.c as u16);
               self.register.a = value;
@@ -985,6 +1017,7 @@ impl Cpu {
               self.register.a = value;
 
               self.bus.add_to_clock(16);
+              self.pc = self.pc.wrapping_add(2);
             }
             _ => panic!("Unknown instruction {:#04x}", instruction),
         }
