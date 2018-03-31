@@ -1,5 +1,5 @@
 pub struct Joypad {
-  isDirection: bool,
+  is_direction: bool,
   
   down: bool,
   up: bool,
@@ -15,7 +15,7 @@ pub struct Joypad {
 impl Joypad {
   pub fn new() -> Joypad {
     Joypad {
-        isDirection: false, // false - selected
+        is_direction: false, // false - selected
 
         down: true, // false - pressed
         up: true,
@@ -30,7 +30,7 @@ impl Joypad {
   }
 
   pub fn get_keys(&self) -> u8 {
-    if !self.isDirection {
+    if !self.is_direction {
       return (self.down as u8) << 3 | (self.up as u8) << 2 | (self.left as u8) << 1 | (self.right as u8);
     } else {
       return (self.start as u8) << 3 | (self.select as u8) << 2 | (self.b as u8) << 1 | (self.a as u8);

@@ -8,7 +8,7 @@ pub struct Flag {
 impl Flag {
     fn new() -> Flag {
         Flag {
-            z: 0,
+            z: 1,
             n: 0,
             h: 0,
             c: 0,
@@ -32,14 +32,14 @@ pub struct Register {
 impl Register {
     pub fn new() -> Register {
         Register {
-            a: 0,
-            b: 0,
-            c: 0,
-            d: 0,
-            e: 0,
-            f: 0,
-            h: 0,
-            l: 0,
+            a: 0x91,
+            b: 0x0C,
+            c: 0x4B,
+            d: 0x00,
+            e: 0x00,
+            f: 0x80,
+            h: 0xA0,
+            l: 0x00,
 
             flag: Flag::new(),
         }

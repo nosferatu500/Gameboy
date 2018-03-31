@@ -59,6 +59,8 @@ fn main() {
     let mut events = sdl_context.event_pump().unwrap();
 
     loop {
+        cpu.update_ime();
+
         cpu.run_next_instruction();
 
         let _ = renderer.set_draw_color(black);
