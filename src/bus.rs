@@ -284,6 +284,9 @@ impl Bus {
                 0xFF43 => {
                     return self.gui.scroll_x;
                 }
+                0xFF44 => {
+                  return self.gui.line;
+                }
                 0xFF45 => {
                     return self.gui.lyc;
                 }

@@ -50,6 +50,8 @@ pub struct Gui {
     pub mode2: u8,
     pub mode1: u8,
     pub mode0: u8,
+
+    pub line: u8,
 }
 
 impl Gui {
@@ -92,6 +94,8 @@ impl Gui {
             mode2: 0,
             mode1: 0,
             mode0: 0,
+
+            line: 0,
         }
     }
 
