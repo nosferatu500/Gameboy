@@ -100,7 +100,7 @@ impl Gui {
     }
 
     pub fn get_data(&self, x: usize, y: usize) -> bool {
-      self.data[y][x] == 1
+        self.data[y][x] == 1
     }
 
     pub fn load(&self, address: u16) -> u8 {

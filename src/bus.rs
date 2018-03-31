@@ -137,19 +137,19 @@ impl Bus {
         if let Some(offset) = map::IO.contains(addr) {
             match addr {
                 0xFF00 => {
-                  return self.joypad.get_keys();
+                    return self.joypad.get_keys();
                 }
                 0xFF01 => {
-                  return self.serial.data;
+                    return self.serial.data;
                 }
                 0xFF02 => {
-                  return self.serial.control;
+                    return self.serial.control;
                 }
                 0xFF03 => {
-                  return 0;
+                    return 0;
                 }
                 0xFF04 => {
-                  return self.clock.divider;
+                    return self.clock.divider;
                 }
                 0xFF05 => {
                     return self.clock.counter as u8;
@@ -168,12 +168,11 @@ impl Bus {
                     };
                     return (status << 2) | value;
                 }
-                0xFF08 | 0xFF09 | 0xFF0A |
-                0xFF0B | 0xFF0C | 0xFF0D | 0xFF0E => {
-                  return 0;
+                0xFF08 | 0xFF09 | 0xFF0A | 0xFF0B | 0xFF0C | 0xFF0D | 0xFF0E => {
+                    return 0;
                 }
                 0xFF0F => {
-                  return self.ifl.get_data();
+                    return self.ifl.get_data();
                 }
                 0xFF10 => {
                     let time = match self.sound_channel_1.sweep_time.round() as i32 {
@@ -188,7 +187,8 @@ impl Bus {
                         _ => unreachable!(),
                     };
 
-                    return time << 4 | (self.sound_channel_1.sweep_mode as u8) << 3 | self.sound_channel_1.shift as u8;
+                    return time << 4 | (self.sound_channel_1.sweep_mode as u8) << 3
+                        | self.sound_channel_1.shift as u8;
                 }
                 0xFF11 => {
                     let pattern = match self.sound_channel_1.wave_pattern.round() as i32 {
@@ -202,13 +202,16 @@ impl Bus {
                     return pattern << 6 | self.sound_channel_1.length as u8;
                 }
                 0xFF12 => {
-                    return (self.sound_channel_1.initial_volume << 4 | (self.sound_channel_1.direction as u16) << 3 | self.sound_channel_1.sweeps as u16) as u8;
+                    return (self.sound_channel_1.initial_volume << 4
+                        | (self.sound_channel_1.direction as u16) << 3
+                        | self.sound_channel_1.sweeps as u16) as u8;
                 }
                 0xFF13 | 0xFF15 | 0xFF18 => {
                     return 0;
                 }
                 0xFF14 => {
-                    return self.sound_channel_1.initial << 7 | self.sound_channel_1.counter << 6 | self.sound_channel_1.frequency;
+                    return self.sound_channel_1.initial << 7 | self.sound_channel_1.counter << 6
+                        | self.sound_channel_1.frequency;
                 }
                 0xFF16 => {
                     let pattern = match self.sound_channel_2.wave_pattern.round() as i32 {
@@ -222,10 +225,13 @@ impl Bus {
                     return (pattern << 6 | self.sound_channel_2.length) as u8;
                 }
                 0xFF17 => {
-                    return (self.sound_channel_2.initial_volume << 4 | (self.sound_channel_2.direction as u16) << 3 | self.sound_channel_2.sweeps as u16) as u8;
+                    return (self.sound_channel_2.initial_volume << 4
+                        | (self.sound_channel_2.direction as u16) << 3
+                        | self.sound_channel_2.sweeps as u16) as u8;
                 }
                 0xFF19 => {
-                    return self.sound_channel_2.initial << 7 | self.sound_channel_2.counter << 6 | self.sound_channel_2.frequency;
+                    return self.sound_channel_2.initial << 7 | self.sound_channel_2.counter << 6
+                        | self.sound_channel_2.frequency;
                 }
                 0xFF1A => {
                     return self.sound_channel_3.enable as u8;
@@ -246,7 +252,8 @@ impl Bus {
                 }
                 0xFF1D | 0xFF1F => return 0,
                 0xFF1E => {
-                    return self.sound_channel_3.initial << 7 | self.sound_channel_3.counter << 6 | self.sound_channel_3.frequency;
+                    return self.sound_channel_3.initial << 7 | self.sound_channel_3.counter << 6
+                        | self.sound_channel_3.frequency;
                 }
                 0xFF20 => {
                     return self.sound_channel_4.length as u8;
@@ -276,7 +283,12 @@ impl Bus {
                         _ => unreachable!(),
                     };
 
-                    return (self.gui.lcd_display as u8) << 7 | window_tile << 6 | (self.gui.window_display as u8) << 5 | bg_window_tile << 4 | bg_tile << 3 | obj_size << 2 | (self.gui.sprite_display as u8) << 1 | self.gui.bg_display as u8;
+                    return (self.gui.lcd_display as u8) << 7 | window_tile << 6
+                        | (self.gui.window_display as u8) << 5
+                        | bg_window_tile << 4 | bg_tile << 3
+                        | obj_size << 2
+                        | (self.gui.sprite_display as u8) << 1
+                        | self.gui.bg_display as u8;
                 }
                 0xFF42 => {
                     return self.gui.scroll_y;
@@ -285,7 +297,7 @@ impl Bus {
                     return self.gui.scroll_x;
                 }
                 0xFF44 => {
-                  return self.gui.line;
+                    return self.gui.line;
                 }
                 0xFF45 => {
                     return self.gui.lyc;
@@ -312,9 +324,9 @@ impl Bus {
     }
 
     pub fn store16(&mut self, addr: u16, value: u16) {
-      // TODO: Probably incorrect. Inverse needed.
-      self.store(addr, (value >> 8) as u8);
-      self.store(addr + 1, (value & 0xFF) as u8);
+        // TODO: Probably incorrect. Inverse needed.
+        self.store(addr, (value >> 8) as u8);
+        self.store(addr + 1, (value & 0xFF) as u8);
     }
 
     pub fn store(&mut self, addr: u16, value: u8) {
@@ -333,18 +345,18 @@ impl Bus {
         if let Some(offset) = map::IO.contains(addr) {
             match addr {
                 0xFF01 => {
-                  return self.serial.data = value;
+                    return self.serial.data = value;
                 }
                 0xFF02 => {
-                  self.serial.transfer_flag = (value >> 7) & 0b1 == 1;
-                  self.serial.clock = value & 0b1 == 1;
-                  return self.serial.control = value;
+                    self.serial.transfer_flag = (value >> 7) & 0b1 == 1;
+                    self.serial.clock = value & 0b1 == 1;
+                    return self.serial.control = value;
                 }
                 0xFF03 => {
-                  return;
+                    return;
                 }
                 0xFF04 => {
-                  return self.clock.divider = 0;
+                    return self.clock.divider = 0;
                 }
                 0xFF05 => {
                     let step = (self.clock.mode / 1024) as u16;
@@ -591,12 +603,12 @@ impl Bus {
                     return;
                 }
                 0xFF41 => {
-                  self.gui.lyc = (value >> 6) & 0b1;
+                    self.gui.lyc = (value >> 6) & 0b1;
 
-                  self.gui.mode2 = (value >> 5) & 0b1;
-                  self.gui.mode1 = (value >> 4) & 0b1;
-                  self.gui.mode0 = (value >> 3) & 0b1;
-                  return;
+                    self.gui.mode2 = (value >> 5) & 0b1;
+                    self.gui.mode1 = (value >> 4) & 0b1;
+                    self.gui.mode0 = (value >> 3) & 0b1;
+                    return;
                 }
                 0xFF42 => {
                     self.gui.scroll_y = value;
@@ -692,7 +704,8 @@ impl InterruptEnable {
     }
 
     pub fn get_data(&self) -> u8 {
-      return (self.joypad as u8) << 4 | (self.serial as u8) << 3 | (self.timer as u8) << 2 | (self.lcd_stat as u8) << 1 | (self.v_blank as u8);
+        return (self.joypad as u8) << 4 | (self.serial as u8) << 3 | (self.timer as u8) << 2
+            | (self.lcd_stat as u8) << 1 | (self.v_blank as u8);
     }
 }
 
@@ -716,6 +729,7 @@ impl InterruptFlag {
     }
 
     pub fn get_data(&self) -> u8 {
-      return (self.joypad as u8) << 4 | (self.serial as u8) << 3 | (self.timer as u8) << 2 | (self.lcd_stat as u8) << 1 | (self.v_blank as u8);
+        return (self.joypad as u8) << 4 | (self.serial as u8) << 3 | (self.timer as u8) << 2
+            | (self.lcd_stat as u8) << 1 | (self.v_blank as u8);
     }
 }

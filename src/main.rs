@@ -1,10 +1,10 @@
-extern crate sdl2;
 extern crate clap;
+extern crate sdl2;
 
 #[macro_use]
 extern crate nom;
 
-use clap::{Arg, App, SubCommand};
+use clap::{App, Arg, SubCommand};
 
 use std::process;
 use std::env::args;
@@ -35,18 +35,22 @@ use debugger::Debugger;
 
 fn main() {
     let matches = App::new("Gameboy Emulator")
-                          .version("0.1")
-                          .author("Vitaly Shvetsov <nosferatu2995@mail.ru>")
-                          .about("Research GB emulation process")
-                          .arg(Arg::with_name("file")
-                               .short("f")
-                               .help("Sets the rom file to use")
-                               .required(true)
-                               .index(1))
-                            .arg(Arg::with_name("debug")
-                                .short("d")
-                                .help("Write cargo run <file> -- -d for enable debug mode"))
-                          .get_matches();
+        .version("0.1")
+        .author("Vitaly Shvetsov <nosferatu2995@mail.ru>")
+        .about("Research GB emulation process")
+        .arg(
+            Arg::with_name("file")
+                .short("f")
+                .help("Sets the rom file to use")
+                .required(true)
+                .index(1),
+        )
+        .arg(
+            Arg::with_name("debug")
+                .short("d")
+                .help("Write cargo run <file> -- -d for enable debug mode"),
+        )
+        .get_matches();
 
     let rom_file = matches.value_of("file").unwrap();
 
@@ -96,14 +100,14 @@ fn main() {
 
             for x in 0..160 {
                 for y in 0..144 {
-                        //let data = bus.gui.get_data(x, y);
+                    //let data = bus.gui.get_data(x, y);
                     // if data {
-                            let x_pos = (x * 5) as i32;
-                            let y_pos = (y * 5) as i32;
-                            rect.set_y(y_pos);
-                            rect.set_x(x_pos);
-                            let _ = renderer.fill_rect(rect);
-                            let _ = renderer.set_draw_color(white);
+                    let x_pos = (x * 5) as i32;
+                    let y_pos = (y * 5) as i32;
+                    rect.set_y(y_pos);
+                    rect.set_x(x_pos);
+                    let _ = renderer.fill_rect(rect);
+                    let _ = renderer.set_draw_color(white);
                     //}
                 }
             }
