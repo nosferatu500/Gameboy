@@ -10,8 +10,8 @@ impl Flag {
         Flag {
             z: 1,
             n: 0,
-            h: 0,
-            c: 0,
+            h: 1,
+            c: 1,
         }
     }
 }
@@ -32,14 +32,14 @@ pub struct Register {
 impl Register {
     pub fn new() -> Register {
         Register {
-            a: 0x91,
-            b: 0x0C,
-            c: 0x4B,
+            a: 0x01,
+            b: 0x00,
+            c: 0x13,
             d: 0x00,
-            e: 0x00,
-            f: 0x80,
-            h: 0xA0,
-            l: 0x00,
+            e: 0xD8,
+            f: 0xB0,
+            h: 0x01,
+            l: 0x4D,
 
             flag: Flag::new(),
         }

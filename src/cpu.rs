@@ -1179,6 +1179,14 @@ impl Cpu {
               
               self.bus.add_to_clock(8);
             }
+            0xC7 => {
+              let value = self.current_pc;
+              self.push_stack(value);
+
+              self.pc = 0x00;
+
+              self.bus.add_to_clock(32);
+            }
             0xC8 => {
               if self.register.flag.z == 1 {
                 self.pop_stack();
@@ -1222,6 +1230,14 @@ impl Cpu {
               
               self.bus.add_to_clock(8);
             }
+            0xCF => {
+              let value = self.current_pc;
+              self.push_stack(value);
+
+              self.pc = 0x08;
+
+              self.bus.add_to_clock(32);
+            }
             0xD0 => {
               if self.register.flag.c == 0 {
                 self.pop_stack();
@@ -1249,6 +1265,14 @@ impl Cpu {
               
               self.bus.add_to_clock(12);
             }
+            0xD7 => {
+              let value = self.current_pc;
+              self.push_stack(value);
+
+              self.pc = 0x10;
+
+              self.bus.add_to_clock(32);
+            }
             0xD8 => {
               if self.register.flag.c == 1 {
                 self.pop_stack();
@@ -1271,6 +1295,14 @@ impl Cpu {
               
               self.bus.add_to_clock(12);
             }
+            0xDF => {
+              let value = self.current_pc;
+              self.push_stack(value);
+
+              self.pc = 0x18;
+
+              self.bus.add_to_clock(32);
+            }
             0xE0 => {
               self.bus.store(0xFF00 + n as u16, self.register.a);
               self.bus.add_to_clock(12);
@@ -1285,6 +1317,14 @@ impl Cpu {
             0xE2 => {
               self.bus.store(0xFF00 + self.register.c as u16, self.register.a);
               self.bus.add_to_clock(8);
+            }
+            0xE7 => {
+              let value = self.current_pc;
+              self.push_stack(value);
+
+              self.pc = 0x20;
+
+              self.bus.add_to_clock(32);
             }
             0xE8 => {
               self.sp = self.sp.wrapping_add(n as u16);
@@ -1310,6 +1350,14 @@ impl Cpu {
 
               self.bus.add_to_clock(8);
             }
+            0xEF => {
+              let value = self.current_pc;
+              self.push_stack(value);
+
+              self.pc = 0x28;
+
+              self.bus.add_to_clock(32);
+            }
             0xF0 => {
               self.register.a = self.bus.load(0xFF00 + n as u16);
               self.bus.add_to_clock(12);
@@ -1329,6 +1377,14 @@ impl Cpu {
             0xF3 => {
               self.di = 2; //Execute after after instruction (jump through 2);
               self.bus.add_to_clock(4);
+            }
+            0xF7 => {
+              let value = self.current_pc;
+              self.push_stack(value);
+
+              self.pc = 0x30;
+
+              self.bus.add_to_clock(32);
             }
             0xF8 => {
               self.bus.store16(self.register.hl(), self.sp + n as u16);
@@ -1356,6 +1412,14 @@ impl Cpu {
 
               self.bus.add_to_clock(8);
               self.pc = self.pc.wrapping_add(1);
+            }
+            0xFF => {
+              let value = self.current_pc;
+              self.push_stack(value);
+
+              self.pc = 0x38;
+
+              self.bus.add_to_clock(32);
             }
             _ => {
               println!("self.pc: {:#04x}", self.current_pc);
