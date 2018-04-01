@@ -65,8 +65,7 @@ fn main() {
 
     let mut cpu = Cpu::new(bus);
 
-    //Temporary comment with issue calculated flags.
-    //cpu.power_up();
+    cpu.power_up();
 
     if matches.is_present("log") {
         cpu.enable_log();
@@ -81,7 +80,7 @@ fn main() {
         let video_subsystem = sdl_context.video().unwrap();
 
         let window = video_subsystem
-            .window("VirtualBoy Emulator by Vitaly Shvetsov", 160 * 5, 144 * 5)
+            .window("Gameboy Emulator by Vitaly Shvetsov", 160 * 5, 144 * 5)
             .position_centered()
             .opengl()
             .build()
@@ -100,25 +99,36 @@ fn main() {
 
         let mut events = sdl_context.event_pump().unwrap();
 
+        cpu.test_draw();
+
         loop {
             cpu.update_ime();
 
             cpu.run_next_instruction();
 
-            let _ = renderer.set_draw_color(black);
+            let _ = renderer.set_draw_color(white);
             let _ = renderer.clear();
 
             for x in 0..160 {
                 for y in 0..144 {
-                    //let data = bus.gui.get_data(x, y);
-                    // if data {
-                    let x_pos = (x * 5) as i32;
-                    let y_pos = (y * 5) as i32;
-                    rect.set_y(y_pos);
-                    rect.set_x(x_pos);
-                    let _ = renderer.fill_rect(rect);
-                    let _ = renderer.set_draw_color(white);
-                    //}
+                    let data = &cpu.get_data_gui(x, y);
+
+                    let c1 = (data >> 16) & 0xFF as u32;
+                    let c2 = (data >> 8) & 0xFF as u32;
+                    let c3 = data & 0xFF as u32;
+
+                    if c1 != 0x00  as u32 || c2 != 0x00  as u32 || c3 != 0x00  as u32 {
+                        let new_color = sdl2::pixels::Color::RGB(c1 as u8, c2 as u8, c3 as u8);
+
+                        let x_pos = (x * 5) as i32;
+                        let y_pos = (y * 5) as i32;
+                        
+                        rect.set_y(y_pos);
+                        rect.set_x(x_pos);
+                        
+                        let _ = renderer.fill_rect(rect);
+                        let _ = renderer.set_draw_color(new_color);
+                    }
                 }
             }
             let _ = renderer.present();

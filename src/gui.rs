@@ -13,7 +13,7 @@ pub enum Color {
 }
 
 pub struct Gui {
-    pub data: [[u8; 160]; 144],
+    pub data: [[[u8; 3]; 144]; 160],
     pub sprite_attrib: [u8; 8 * 1024],
 
     pub lcd_display: bool,
@@ -57,7 +57,7 @@ pub struct Gui {
 impl Gui {
     pub fn new() -> Gui {
         Gui {
-            data: [[0; 160]; 144],
+            data: [[[0; 3]; 144]; 160],
             sprite_attrib: [0; 8 * 1024],
 
             lcd_display: false,
@@ -99,16 +99,34 @@ impl Gui {
         }
     }
 
-    pub fn get_data(&self, x: usize, y: usize) -> bool {
-        self.data[y][x] == 1
+    pub fn test_draw(&mut self) {
+        //Initialize. 
+        //It's weird, but without pixel on 0:0, another pixels have not detected status.
+        self.data[0][0][0] = 0xFF;
+        self.data[0][0][1] = 0x00; 
+        self.data[0][0][2] = 0x00;
+
+        self.data[160/2][144/2][0] = 0xFF;
+        self.data[160/2][144/2][1] = 0x00; 
+        self.data[160/2][144/2][2] = 0x00;
+    }
+
+    pub fn get_data(&self, x: usize, y: usize) -> u32 {
+        let c1 = self.data[x][y][0] as u32;
+        let c2 = self.data[x][y][1] as u32;
+        let c3 = self.data[x][y][2] as u32;
+
+        c1 << 16 | c2 << 8 | c3
     }
 
     pub fn load(&self, address: u16) -> u8 {
-        self.data[(address as usize) % 144][(address as usize) % 160]
+        // TODO: Re-write it.
+        self.data[(address as usize) % 144][(address as usize) % 160][0]
     }
 
     pub fn store(&mut self, address: u16, value: u8) {
-        self.data[(address as usize) % 144][(address as usize) % 160] = value;
+        // TODO: Re-write it.
+        self.data[(address as usize) % 144][(address as usize) % 160][0] = value;
     }
 
     pub fn load_sprite(&self, address: u16) -> u8 {

@@ -63,6 +63,14 @@ impl Cpu {
         };
     }
 
+    pub fn test_draw(&mut self) {
+      self.bus.gui.test_draw();
+    }
+
+    pub fn get_data_gui(&self, x: usize, y: usize) -> u32 {
+      self.bus.gui.get_data(x, y)
+    }
+
     pub fn enable_log(&mut self) {
       self.log = true;
     }
