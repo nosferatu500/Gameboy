@@ -36,6 +36,10 @@ impl Cpu {
         }
     }
 
+    pub fn get_pc(&self) -> u16 {
+      self.current_pc
+    }
+
     pub fn update_ime(&mut self) {
         self.di = match self.di {
             2 => 1,
@@ -417,7 +421,7 @@ impl Cpu {
             }
             0x20 => {
                 if self.register.flag.z == 0 {
-                    self.pc = self.current_pc.wrapping_sub(3);
+                    self.pc = self.pc.wrapping_add((n as i8) as u16);
                 }
                 self.pc = self.pc.wrapping_add(1);
                 self.bus.add_to_clock(8);

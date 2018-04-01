@@ -10,6 +10,7 @@ use nom::{digit, eof, space, IResult};
 #[derive(Debug, Clone, Copy)]
 pub enum Command {
     Step(usize),
+    Jump(u16),
     Repeat,
     Exit,
 }
@@ -52,6 +53,7 @@ impl Debugger {
 
             match command {
                 Ok(Command::Step(count)) => self.step(count),
+                Ok(Command::Jump(addr)) => self.jump(addr),
                 Ok(Command::Exit) => break,
                 Ok(Command::Repeat) => unreachable!(),
                 Err(ref e) => println!("{}", e),
@@ -66,6 +68,13 @@ impl Debugger {
             self.cpu.update_ime();
             self.cpu.run_next_instruction();
         }
+    }
+
+    pub fn jump(&mut self, addr: u16) {
+      while self.cpu.get_pc() != addr {
+        self.cpu.update_ime();
+        self.cpu.run_next_instruction();
+      }
     }
 }
 
@@ -95,6 +104,14 @@ named!(
 );
 
 named!(
+    jump<Command>,
+    chain!(
+        alt_complete!(tag!("jump") | tag!("j")) ~
+            addr: opt!(preceded!(space, u16_parser)),
+        || Command::Jump(addr.unwrap()))
+);
+
+named!(
     exit<Command>,
     map!(
         alt_complete!(tag!("exit") | tag!("quit") | tag!("e") | tag!("q")),
@@ -106,5 +123,10 @@ named!(repeat<Command>, value!(Command::Repeat));
 
 named!(
     usize_parser<usize>,
+    map_res!(map_res!(digit, str::from_utf8), FromStr::from_str)
+);
+
+named!(
+    u16_parser<u16>,
     map_res!(map_res!(digit, str::from_utf8), FromStr::from_str)
 );
