@@ -15,6 +15,8 @@ pub struct Cpu {
 
     di: u32,
     ei: u32,
+
+    log: bool,
 }
 
 impl Cpu {
@@ -33,6 +35,8 @@ impl Cpu {
 
             di: 0,
             ei: 0,
+
+            log: false,
         }
     }
 
@@ -57,6 +61,10 @@ impl Cpu {
             }
             _ => 0,
         };
+    }
+
+    pub fn enable_log(&mut self) {
+      self.log = true;
     }
 
     fn update_register_f(&mut self) {
@@ -85,42 +93,43 @@ impl Cpu {
         self.current_pc = self.pc;
 
         //Only for debug purposes.
+        if self.log {
+          println!("");
+          println!("| PC |: {:#06X}", self.pc);
+          println!("");
 
-        println!("");
-        println!("| PC |: {:#06X}", self.pc);
-        println!("");
+          println!("| SP |: {:#06X}", self.sp);
+          println!(" ");
 
-        println!("| SP |: {:#06X}", self.sp);
-        println!(" ");
+          println!("| IN |: {:#04x}", instruction);
+          println!(" ");
+          let nn = (self.bus.load(self.current_pc + 2) as u16) << 8
+              | self.bus.load(self.current_pc + 1) as u16;
+          println!("| nn |: {:04X}", nn);
+          println!(" ");
+          let n = self.bus.load(self.current_pc + 1);
+          println!("| n  |: {:02X}", n);
+          println!(" ");
 
-        println!("| IN |: {:#04x}", instruction);
-        println!(" ");
-        let nn = (self.bus.load(self.current_pc + 2) as u16) << 8
-            | self.bus.load(self.current_pc + 1) as u16;
-        println!("| nn |: {:04X}", nn);
-        println!(" ");
-        let n = self.bus.load(self.current_pc + 1);
-        println!("| n  |: {:02X}", n);
-        println!(" ");
+          println!("| Z  |: {:x}", self.register.flag.z);
+          println!("| N  |: {:x}", self.register.flag.n);
+          println!("| H  |: {:x}", self.register.flag.h);
+          println!("| C  |: {:x}", self.register.flag.c);
+          println!(" ");
 
-        println!("| Z  |: {:x}", self.register.flag.z);
-        println!("| N  |: {:x}", self.register.flag.n);
-        println!("| H  |: {:x}", self.register.flag.h);
-        println!("| C  |: {:x}", self.register.flag.c);
-        println!(" ");
+          println!("| AF |: {:#06X}", self.register.af());
+          println!(" ");
 
-        println!("| AF |: {:#06X}", self.register.af());
-        println!(" ");
+          println!("| BC |: {:#06X}", self.register.bc());
+          println!(" ");
 
-        println!("| BC |: {:#06X}", self.register.bc());
-        println!(" ");
+          println!("| DE |: {:#06X}", self.register.de());
+          println!(" ");
 
-        println!("| DE |: {:#06X}", self.register.de());
-        println!(" ");
-
-        println!("| HL |: {:#06X}", self.register.hl());
-        println!(" ");
-        println!("***********************************");
+          println!("| HL |: {:#06X}", self.register.hl());
+          println!(" ");
+          println!("***********************************");
+        }
 
         self.pc = self.pc.wrapping_add(1);
 

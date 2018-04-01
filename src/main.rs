@@ -50,6 +50,11 @@ fn main() {
                 .short("d")
                 .help("Write cargo run <file> -- -d for enable debug mode"),
         )
+        .arg(
+            Arg::with_name("log")
+                .short("l")
+                .help("Write cargo run <file> -- -l for enable log mode"),
+        )
         .get_matches();
 
     let rom_file = matches.value_of("file").unwrap();
@@ -63,7 +68,12 @@ fn main() {
     //Temporary comment with issue calculated flags.
     //cpu.power_up();
 
+    if matches.is_present("log") {
+        cpu.enable_log();
+    }
+
     if matches.is_present("debug") {
+        cpu.enable_log();
         let mut debugger = Debugger::new(cpu);
         debugger.run();
     } else {

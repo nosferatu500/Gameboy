@@ -338,6 +338,10 @@ impl Bus {
             return self.gui.store(offset, value);
         }
 
+        if let Some(offset) = map::HIGH_INTERNAL_RAM.contains(addr) {
+            return self.ram.store(offset, value);
+        }
+
         if let Some(offset) = map::SWITCHABLE_ROM.contains(addr) {
             return self.rom.store(offset, value);
         }
@@ -383,6 +387,14 @@ impl Bus {
                         0x11 => 16384,
                         _ => unreachable!(),
                     };
+                    return;
+                }
+                0xFF0F => {
+                    self.ifl.v_blank = value & 0b1 == 1;
+                    self.ifl.lcd_stat = (value >> 1) & 0b1 == 1;
+                    self.ifl.timer = (value >> 2) & 0b1 == 1;
+                    self.ifl.serial = (value >> 3) & 0b1 == 1;
+                    self.ifl.joypad = (value >> 4) & 0b1 == 1;
                     return;
                 }
                 0xFF10 => {
