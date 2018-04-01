@@ -71,10 +71,10 @@ impl Debugger {
     }
 
     pub fn jump(&mut self, addr: u16) {
-      while self.cpu.get_pc() != addr {
-        self.cpu.update_ime();
-        self.cpu.run_next_instruction();
-      }
+        while self.cpu.get_pc() != addr {
+            self.cpu.update_ime();
+            self.cpu.run_next_instruction();
+        }
     }
 }
 
