@@ -71,6 +71,7 @@ impl Debugger {
     }
 
     pub fn jump(&mut self, addr: u16) {
+        panic!("{:x}", addr);
         while self.cpu.get_pc() != addr {
             self.cpu.update_ime();
             self.cpu.run_next_instruction();
@@ -89,6 +90,7 @@ named!(
     chain!(
         c: alt_complete!(
             step |
+            jump |
             exit |
             repeat) ~
             eof,

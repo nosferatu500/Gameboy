@@ -6,11 +6,30 @@ pub const MIN_SPRITE_SIZE: u32 = 8;
 
 #[derive(Clone, Copy)]
 pub enum Color {
-    White = 0b00,
-    LightGray = 0b01,
-    DarkGray = 0b10,
-    Black = 0b11,
+    //TODO: Probably we must using A-RGB format where A - 0xFF
+    White = 0b00, // 0xFFFFFF
+    LightGray = 0b01, // 0xAAAAAA
+    DarkGray = 0b10, // 0x555555
+    Black = 0b11, // 0x000000
 }
+
+// lcdc 91
+// stat 85
+// cnt  28
+// if   E1
+
+pub struct OAM {
+    coord_x: u8,
+    coord_y: u8,
+
+    priority: u8,
+
+    flip_h: bool,
+    flip_v: bool,
+
+    size_x: u32,
+    size_y: u32,
+} 
 
 pub struct Gui {
     pub data: [[[u8; 3]; 144]; 160],
@@ -52,6 +71,9 @@ pub struct Gui {
     pub mode0: u8,
 
     pub line: u8,
+
+    bg_display_data_1: [u8; 1024],
+    bg_display_data_2: [u8; 1024],
 }
 
 impl Gui {
@@ -96,6 +118,9 @@ impl Gui {
             mode0: 0,
 
             line: 0,
+
+            bg_display_data_1: [0; 1024],
+            bg_display_data_2: [0; 1024],
         }
     }
 
@@ -119,14 +144,20 @@ impl Gui {
         c1 << 16 | c2 << 8 | c3
     }
 
-    pub fn load(&self, address: u16) -> u8 {
-        // TODO: Re-write it.
-        self.data[(address as usize) % 144][(address as usize) % 160][0]
+    pub fn store_bg_display_data_1(&mut self, address: u16, value: u8) {
+        self.bg_display_data_1[address as usize] = value;
     }
 
-    pub fn store(&mut self, address: u16, value: u8) {
-        // TODO: Re-write it.
-        self.data[(address as usize) % 144][(address as usize) % 160][0] = value;
+    pub fn load_bg_display_data_1(&self, address: u16) -> u8 {
+        self.bg_display_data_1[address as usize]
+    }
+
+    pub fn store_bg_display_data_2(&mut self, address: u16, value: u8) {
+        self.bg_display_data_2[address as usize] = value;
+    }
+
+    pub fn load_bg_display_data_2(&self, address: u16) -> u8 {
+        self.bg_display_data_2[address as usize]
     }
 
     pub fn load_sprite(&self, address: u16) -> u8 {

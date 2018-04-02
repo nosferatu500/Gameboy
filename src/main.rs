@@ -4,11 +4,9 @@ extern crate sdl2;
 #[macro_use]
 extern crate nom;
 
-use clap::{App, Arg, SubCommand};
+use clap::{App, Arg};
 
 use std::process;
-use std::env::args;
-use std::time::{Duration, Instant};
 
 use sdl2::rect::Rect;
 use sdl2::event::Event;

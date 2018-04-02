@@ -27,6 +27,12 @@ mod map {
 
     pub const VIDEO_RAM: Range = Range(0x8000, 0x9FFF);
 
+    pub const CHARACTER_DATA: Range = Range(0x8000, 0x97FF);
+
+    pub const BG_DISPLAY_DATA_1: Range = Range(0x9800, 0x9BFF);
+
+    pub const BG_DISPLAY_DATA_2: Range = Range(0x9C00, 0x9FFF);    
+
     pub const SWITCHABLE_RAM: Range = Range(0xA000, 0xBFFF);
 
     pub const INTERNAL_RAM: Range = Range(0xC000, 0xDFFF);
@@ -103,7 +109,18 @@ impl Bus {
         }
 
         if let Some(offset) = map::VIDEO_RAM.contains(addr) {
-            return self.gui.load(offset);
+            
+            if let Some(offset) = map::CHARACTER_DATA.contains(addr) {
+                panic!("load CHARACTER_DATA");
+            }
+
+            if let Some(offset) = map::BG_DISPLAY_DATA_1.contains(addr) {
+                return self.gui.load_bg_display_data_1(addr);
+            }
+
+            if let Some(offset) = map::BG_DISPLAY_DATA_2.contains(addr) {
+                return self.gui.load_bg_display_data_2(addr);       
+            }
         }
 
         if let Some(offset) = map::SPRITE_ATTRIB_MEMORY.contains(addr) {
@@ -331,11 +348,22 @@ impl Bus {
 
     pub fn store(&mut self, addr: u16, value: u8) {
         if let Some(offset) = map::ROM.contains(addr) {
-            return self.rom.store(offset, value);
+            println!("Unexpected writing to ROM: addr: {:x} value: {:x}", offset, value);
         }
 
         if let Some(offset) = map::VIDEO_RAM.contains(addr) {
-            return self.gui.store(offset, value);
+            
+            if let Some(offset) = map::CHARACTER_DATA.contains(addr) {
+                panic!("store CHARACTER_DATA");
+            }
+
+            if let Some(offset) = map::BG_DISPLAY_DATA_1.contains(addr) {
+                return self.gui.store_bg_display_data_1(addr, value);         
+            }
+
+            if let Some(offset) = map::BG_DISPLAY_DATA_2.contains(addr) {
+                return self.gui.store_bg_display_data_2(addr, value);          
+            }
         }
 
         if let Some(offset) = map::HIGH_INTERNAL_RAM.contains(addr) {
@@ -343,7 +371,7 @@ impl Bus {
         }
 
         if let Some(offset) = map::SWITCHABLE_ROM.contains(addr) {
-            return self.rom.store(offset, value);
+            println!("Unexpected writing to SWITCHABLE_ROM: addr: {:x} value: {:x}", offset, value);
         }
 
         if let Some(offset) = map::IO.contains(addr) {
@@ -732,7 +760,7 @@ struct InterruptFlag {
 impl InterruptFlag {
     pub fn new() -> InterruptFlag {
         InterruptFlag {
-            v_blank: false,
+            v_blank: true,
             lcd_stat: false,
             timer: false,
             serial: false,
