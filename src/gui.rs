@@ -70,7 +70,12 @@ pub struct Gui {
     pub mode1: u8,
     pub mode0: u8,
 
+    // 00 - H-Blank 01 - V-Blank 10 - OAM 11 - Transfering data to LCD.
+    pub mode_flag: u8,
+
     pub line: u8,
+
+    pub coincidence: u8, // 1 - LYC == LY
 
     bg_display_data_1: [u8; 1024],
     bg_display_data_2: [u8; 1024],
@@ -103,6 +108,8 @@ impl Gui {
 
             lyc: 0,
 
+            coincidence: 1,
+
             color: Color::White,
 
             pallete_base: [0; 4],
@@ -116,6 +123,8 @@ impl Gui {
             mode2: 0,
             mode1: 0,
             mode0: 0,
+
+            mode_flag: 0b01,
 
             line: 0,
 

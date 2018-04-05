@@ -136,6 +136,44 @@ impl Cpu {
 
           println!("| HL |: {:#06X}", self.register.hl());
           println!(" ");
+
+          println!(" ");
+
+          println!("| LCDC FF40 |: {:#06X}", self.bus.load(0xFF40));
+          println!(" ");
+
+          println!("| STAT FF41 |: {:#06X}", self.bus.load(0xFF41));
+          println!(" ");
+
+          println!("| LY FF44 |: {:#06X}", self.bus.load(0xFF44));
+          println!(" ");
+
+          println!("| SCY FF42 |: {:#06X}", self.bus.load(0xFF42));
+          println!(" ");
+
+          println!("| SCX FF43 |: {:#06X}", self.bus.load(0xFF43));
+          println!(" ");
+
+          println!("| LYC FF45 |: {:#06X}", self.bus.load(0xFF45));
+          println!(" ");
+
+          //println!("| DMA FF46 |: {:#06X}", self.bus.load(0xFF46));
+          println!(" ");
+
+          println!("| BGP FF47 |: {:#06X}", self.bus.load(0xFF47));
+          println!(" ");
+
+          println!("| OBP0 FF48 |: {:#06X}", self.bus.load(0xFF48));
+          println!(" ");
+
+          println!("| OBP1 FF49 |: {:#06X}", self.bus.load(0xFF49));
+          println!(" ");
+
+          println!("| WY FF4A |: {:#06X}", self.bus.load(0xFF4A));
+          println!(" ");
+
+          println!("| WX FF4B |: {:#06X}", self.bus.load(0xFF4B));
+          println!(" ");
           println!("***********************************");
         }
 

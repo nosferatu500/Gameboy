@@ -307,6 +307,9 @@ impl Bus {
                         | (self.gui.sprite_display as u8) << 1
                         | self.gui.bg_display as u8;
                 }
+                0xFF41 => {
+                    return 0x80 | self.gui.lyc << 6 | self.gui.mode2 << 5 | self.gui.mode1 << 4 | self.gui.mode0 << 3 | self.gui.coincidence << 2 | self.gui.mode_flag;
+                }
                 0xFF42 => {
                     return self.gui.scroll_y;
                 }
@@ -318,6 +321,17 @@ impl Bus {
                 }
                 0xFF45 => {
                     return self.gui.lyc;
+                }
+                0xFF47 => {
+                    return (self.gui.pallete_base[Color::Black as usize] << 6 | self.gui.pallete_base[Color::DarkGray as usize] << 4 | self.gui.pallete_base[Color::LightGray as usize] << 2 | self.gui.pallete_base[Color::White as usize]) as u8;
+                }
+                0xFF48 => {
+                    // WARNING: 0-1 bytes - 0b11 because of transperency flag
+                    return (self.gui.pallete_0[Color::Black as usize] << 6 | self.gui.pallete_0[Color::DarkGray as usize] << 4 | self.gui.pallete_0[Color::LightGray as usize] << 2 | 0b11) as u8;
+                }
+                0xFF49 => {
+                    // WARNING: 0-1 bytes - 0b11 because of transperency flag
+                    return (self.gui.pallete_1[Color::Black as usize] << 6 | self.gui.pallete_1[Color::DarkGray as usize] << 4 | self.gui.pallete_1[Color::LightGray as usize] << 2 | 0b11) as u8;
                 }
                 0xFF4A => {
                     return self.gui.window_y;
