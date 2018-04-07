@@ -4,6 +4,8 @@ extern crate sdl2;
 #[macro_use]
 extern crate nom;
 
+pub type StrResult<T> = Result<T, &'static str>;
+
 use clap::{App, Arg};
 
 use std::process;
@@ -12,7 +14,6 @@ use sdl2::rect::Rect;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 
-mod rom;
 mod bus;
 mod cpu;
 
@@ -20,12 +21,11 @@ mod register;
 mod clock;
 mod sound;
 mod gui;
-mod ram;
 mod joypad;
 mod serial;
 mod debugger;
+mod mbc;
 
-use rom::Rom;
 use bus::Bus;
 use cpu::Cpu;
 
@@ -57,9 +57,9 @@ fn main() {
 
     let rom_file = matches.value_of("file").unwrap();
 
-    let rom = Rom::new(&rom_file).unwrap();
+    let mbc = ::mbc::get_mbc(&rom_file).unwrap();
 
-    let bus = Bus::new(rom);
+    let bus = Bus::new(mbc);
 
     let mut cpu = Cpu::new(bus);
 

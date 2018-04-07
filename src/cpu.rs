@@ -17,6 +17,8 @@ pub struct Cpu {
     ei: u32,
 
     log: bool,
+
+    cartrige_type: u8,
 }
 
 impl Cpu {
@@ -37,6 +39,8 @@ impl Cpu {
             ei: 0,
 
             log: false,
+
+            cartrige_type: 0x00,
         }
     }
 
@@ -125,13 +129,17 @@ impl Cpu {
           println!("| C  |: {:x}", self.register.flag.c);
           println!(" ");
 
-          println!("| AF |: {:#06X}", self.register.af());
+          print!("| AF |: {:#06X}", self.register.af());
+          print!("\t| LCDC FF40 |: {:#06X}", self.bus.load(0xFF40));
+          
           println!(" ");
 
-          println!("| BC |: {:#06X}", self.register.bc());
+          print!("| BC |: {:#06X}", self.register.bc());
+          print!("\t| STAT FF41 |: {:#06X}", self.bus.load(0xFF41));
           println!(" ");
 
-          println!("| DE |: {:#06X}", self.register.de());
+          print!("| DE |: {:#06X}", self.register.de());
+          print!("\t| LY FF44 |: {:#06X}", self.bus.load(0xFF44));
           println!(" ");
 
           println!("| HL |: {:#06X}", self.register.hl());
@@ -139,13 +147,10 @@ impl Cpu {
 
           println!(" ");
 
-          println!("| LCDC FF40 |: {:#06X}", self.bus.load(0xFF40));
           println!(" ");
 
-          println!("| STAT FF41 |: {:#06X}", self.bus.load(0xFF41));
           println!(" ");
 
-          println!("| LY FF44 |: {:#06X}", self.bus.load(0xFF44));
           println!(" ");
 
           println!("| SCY FF42 |: {:#06X}", self.bus.load(0xFF42));
@@ -173,6 +178,16 @@ impl Cpu {
           println!(" ");
 
           println!("| WX FF4B |: {:#06X}", self.bus.load(0xFF4B));
+          println!(" ");
+          println!(" ");
+
+          println!("| TYPE 0147 |: {:#06X}", self.bus.load(0x0147));
+          println!(" ");
+
+          println!("| ROM 0148 |: {:#06X}", self.bus.load(0x0148));
+          println!(" ");
+
+          println!("| RAM 0149 |: {:#06X}", self.bus.load(0x0149));
           println!(" ");
           println!("***********************************");
         }

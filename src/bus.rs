@@ -1,8 +1,6 @@
-use rom::Rom;
 use clock::Clock;
 use sound::Sound;
 use gui::*;
-use ram::Ram;
 use joypad::Joypad;
 use serial::Serial;
 
@@ -51,7 +49,8 @@ mod map {
 }
 
 pub struct Bus {
-    rom: Rom,
+    mbc: Box<::mbc::MBC+'static>,
+
     clock: Clock,
 
     sound_channel_1: Sound,
@@ -64,17 +63,15 @@ pub struct Bus {
     ie: InterruptEnable,
     ifl: InterruptFlag,
 
-    ram: Ram,
-
     joypad: Joypad,
 
     serial: Serial,
 }
 
 impl Bus {
-    pub fn new(rom: Rom) -> Bus {
+    pub fn new(mbc: Box<::mbc::MBC+'static>) -> Bus {
         Bus {
-            rom,
+            mbc,
             clock: Clock::new(),
 
             sound_channel_1: Sound::new(),
@@ -86,8 +83,6 @@ impl Bus {
 
             ie: InterruptEnable::new(),
             ifl: InterruptFlag::new(),
-
-            ram: Ram::new(),
 
             joypad: Joypad::new(),
 
@@ -101,11 +96,11 @@ impl Bus {
 
     pub fn load(&self, addr: u16) -> u8 {
         if let Some(offset) = map::ROM.contains(addr) {
-            return self.rom.load(offset);
+            return self.mbc.readrom(offset)
         }
 
         if let Some(offset) = map::SWITCHABLE_ROM.contains(addr) {
-            return self.rom.load(offset);
+            return self.mbc.readrom(offset)
         }
 
         if let Some(offset) = map::VIDEO_RAM.contains(addr) {
@@ -128,19 +123,22 @@ impl Bus {
         }
 
         if let Some(offset) = map::SWITCHABLE_RAM.contains(addr) {
-            return self.ram.load(offset);
+            return self.mbc.readram(offset)
         }
 
         if let Some(offset) = map::INTERNAL_RAM.contains(addr) {
-            return self.ram.load(offset);
+            panic!("load INTERNAL_RAM");
+            //return self.ram.load(offset);
         }
 
         if let Some(offset) = map::ECHO_INTERNAL_RAM.contains(addr) {
-            return self.ram.load(offset);
+            panic!("load ECHO_INTERNAL_RAM");
+            //return self.ram.load(offset);
         }
 
         if let Some(offset) = map::HIGH_INTERNAL_RAM.contains(addr) {
-            return self.ram.load(offset);
+            panic!("load HIGH_INTERNAL_RAM");
+            //return self.ram.load(offset);
         }
 
         if let Some(offset) = map::NOT_USABLE_1.contains(addr) {
@@ -381,7 +379,8 @@ impl Bus {
         }
 
         if let Some(offset) = map::HIGH_INTERNAL_RAM.contains(addr) {
-            return self.ram.store(offset, value);
+            panic!("store HIGH_INTERNAL_RAM");
+            //return self.ram.store(offset, value);
         }
 
         if let Some(offset) = map::SWITCHABLE_ROM.contains(addr) {
@@ -716,13 +715,15 @@ impl Bus {
         }
 
         if let Some(offset) = map::ECHO_INTERNAL_RAM.contains(addr) {
-            self.rom.store(offset - 0x2000, value); // internal
-            return self.rom.store(offset, value); //echo
+            panic!("store ECHO_INTERNAL_RAM");
+            // self.rom.store(offset - 0x2000, value); // internal
+            // return self.rom.store(offset, value); //echo
         }
 
         if let Some(offset) = map::INTERNAL_RAM.contains(addr) {
-            self.rom.store(offset + 0x2000, value); //echo
-            return self.rom.store(offset, value); //internal
+            panic!("store INTERNAL_RAM");
+            // self.rom.store(offset + 0x2000, value); //echo
+            // return self.rom.store(offset, value); //internal
         }
 
         if addr == 0xFFFF {
