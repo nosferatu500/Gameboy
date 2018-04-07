@@ -244,6 +244,94 @@ impl Cpu {
         let n = self.bus.load(self.current_pc + 1);
 
         match instruction {
+            0x30 => {
+                let value = self.register.b;
+                self.register.b = (value >> 4) | (value << 4);
+
+                self.register.flag.z = (value == 0) as u8;
+                self.register.flag.n = 0;
+                self.register.flag.h = 0;
+                self.register.flag.c = 0;
+
+                self.bus.add_to_clock(8);
+            }
+            0x31 => {
+                let value = self.register.c;
+                self.register.c = (value >> 4) | (value << 4);
+
+                self.register.flag.z = (value == 0) as u8;
+                self.register.flag.n = 0;
+                self.register.flag.h = 0;
+                self.register.flag.c = 0;
+
+                self.bus.add_to_clock(8);
+            }
+            0x32 => {
+                let value = self.register.d;
+                self.register.d = (value >> 4) | (value << 4);
+
+                self.register.flag.z = (value == 0) as u8;
+                self.register.flag.n = 0;
+                self.register.flag.h = 0;
+                self.register.flag.c = 0;
+
+                self.bus.add_to_clock(8);
+            }
+            0x33 => {
+                let value = self.register.e;
+                self.register.e = (value >> 4) | (value << 4);
+
+                self.register.flag.z = (value == 0) as u8;
+                self.register.flag.n = 0;
+                self.register.flag.h = 0;
+                self.register.flag.c = 0;
+
+                self.bus.add_to_clock(8);
+            }
+            0x34 => {
+                let value = self.register.h;
+                self.register.h = (value >> 4) | (value << 4);
+
+                self.register.flag.z = (value == 0) as u8;
+                self.register.flag.n = 0;
+                self.register.flag.h = 0;
+                self.register.flag.c = 0;
+
+                self.bus.add_to_clock(8);
+            }
+            0x35 => {
+                let value = self.register.l;
+                self.register.l = (value >> 4) | (value << 4);
+
+                self.register.flag.z = (value == 0) as u8;
+                self.register.flag.n = 0;
+                self.register.flag.h = 0;
+                self.register.flag.c = 0;
+
+                self.bus.add_to_clock(8);
+            }
+            0x36 => {
+                let value = self.bus.load(self.register.hl());
+                self.bus.store(self.register.hl(), (value >> 4) | (value << 4));
+
+                self.register.flag.z = (value == 0) as u8;
+                self.register.flag.n = 0;
+                self.register.flag.h = 0;
+                self.register.flag.c = 0;
+
+                self.bus.add_to_clock(16);
+            }
+            0x37 => {
+                let value = self.register.a;
+                self.register.a = (value >> 4) | (value << 4);
+
+                self.register.flag.z = (value == 0) as u8;
+                self.register.flag.n = 0;
+                self.register.flag.h = 0;
+                self.register.flag.c = 0;
+
+                self.bus.add_to_clock(8);
+            }
             0x80 => {
                 self.register.b = self.register.b & !(1 << 0);
                 self.bus.add_to_clock(8);
