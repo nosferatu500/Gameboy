@@ -66,7 +66,7 @@ impl Debugger {
     pub fn step(&mut self, count: usize) {
         for _ in 0..count {
             self.cpu.update_ime();
-            self.cpu.run_next_instruction();
+            self.cpu.run_next_instruction(false);
         }
     }
 
@@ -74,7 +74,7 @@ impl Debugger {
         panic!("{:x}", addr);
         while self.cpu.get_pc() != addr {
             self.cpu.update_ime();
-            self.cpu.run_next_instruction();
+            self.cpu.run_next_instruction(false);
         }
     }
 }

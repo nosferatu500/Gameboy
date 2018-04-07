@@ -102,7 +102,7 @@ fn main() {
         loop {
             cpu.update_ime();
 
-            cpu.run_next_instruction();
+            cpu.run_next_instruction(false);
 
             let _ = renderer.set_draw_color(white);
             let _ = renderer.clear();

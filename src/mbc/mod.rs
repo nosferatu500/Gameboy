@@ -3,6 +3,7 @@ use std::fs::File;
 use std::path::Path;
 
 mod mbc0;
+mod mbc1;
 
 // Cartrige types
 
@@ -10,9 +11,9 @@ mod mbc0;
 // 0x0148 - ROM size
 // 0x0149 - RAM size
 
-// 00h ROM ONLY
-// 01h ROM+MBC1
-// 02h ROM+MBC1+RAM
+// 00h ROM ONLY - Done.
+// 01h ROM+MBC1 - Done.
+// 02h ROM+MBC1+RAM - Done.
 // 03h ROM+MBC1+RAM+BATT
 // 05h ROM+MBC2
 // 06h ROM+MBC2+BATTERY
@@ -58,7 +59,34 @@ pub fn get_mbc<P: AsRef<Path>>(path: P) -> ::StrResult<Box<MBC+'static>> {
     
     match buf[0x147] {
         0x00 => mbc0::MBC0::new(buf).map(|v| Box::new(v) as Box<MBC>),
+        0x01 ... 0x03 => mbc1::MBC1::new(buf).map(|v| Box::new(v) as Box<MBC>),
         _ => { Err("Unsupported MBC type") },
+    }
+}
+
+pub fn ram_size(v: u8) -> usize {
+    match v {
+        1 => 2 * 1024, // 1 bank
+        2 => 8 * 1024, // 1 bank
+        3 => 32 * 1024, // 4 banks
+        4 => 128 * 1024, // 16 banks
+        _ => 0,
+    }
+}
+
+pub fn rom_size(v: u8) -> usize {
+    match v {
+        0 => 32 * 1024, // 2 bank
+        1 => 64 * 1024, // 4 bank
+        2 => 128 * 1024, // 8 banks
+        3 => 256 * 1024, // 16 banks
+        4 => 512 * 1024, // 32 banks
+        5 => 1 * 1024 * 1024, // 64 banks
+        6 => 2 * 1024 * 1024, // 128 banks
+        // 52 => 1.1 * 1024 * 1024, // 72 banks
+        // 53 => 1.2 * 1024 * 1024, // 80 banks
+        // 54 => 1.5 * 1024 * 1024, // 96 banks
+        _ => panic!("Unexpected rom size"),
     }
 }
 

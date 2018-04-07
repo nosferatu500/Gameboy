@@ -66,6 +66,8 @@ pub struct Bus {
     joypad: Joypad,
 
     serial: Serial,
+
+    hram: [u8; 0xFFFE - 0xFF80 + 0x1],
 }
 
 impl Bus {
@@ -87,6 +89,8 @@ impl Bus {
             joypad: Joypad::new(),
 
             serial: Serial::new(),
+
+            hram: [0; 0xFFFE - 0xFF80 + 0x1],
         }
     }
 
@@ -137,8 +141,7 @@ impl Bus {
         }
 
         if let Some(offset) = map::HIGH_INTERNAL_RAM.contains(addr) {
-            panic!("load HIGH_INTERNAL_RAM");
-            //return self.ram.load(offset);
+            return self.hram[offset as usize & 0x007F];
         }
 
         if let Some(offset) = map::NOT_USABLE_1.contains(addr) {
@@ -379,8 +382,7 @@ impl Bus {
         }
 
         if let Some(offset) = map::HIGH_INTERNAL_RAM.contains(addr) {
-            panic!("store HIGH_INTERNAL_RAM");
-            //return self.ram.store(offset, value);
+            return self.hram[offset as usize & 0x007F] = value;
         }
 
         if let Some(offset) = map::SWITCHABLE_ROM.contains(addr) {

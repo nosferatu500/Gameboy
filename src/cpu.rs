@@ -99,7 +99,7 @@ impl Cpu {
         instruction
     }
 
-    pub fn run_next_instruction(&mut self) {
+    pub fn run_next_instruction(&mut self, callback: bool) {
         let instruction = self.bus.load(self.pc);
 
         self.current_pc = self.pc;
@@ -145,14 +145,6 @@ impl Cpu {
           println!("| HL |: {:#06X}", self.register.hl());
           println!(" ");
 
-          println!(" ");
-
-          println!(" ");
-
-          println!(" ");
-
-          println!(" ");
-
           println!("| SCY FF42 |: {:#06X}", self.bus.load(0xFF42));
           println!(" ");
 
@@ -194,7 +186,12 @@ impl Cpu {
 
         self.pc = self.pc.wrapping_add(1);
 
-        self.decode(instruction);
+        if callback {
+            self.decode_callback(instruction);
+        } else {
+            self.decode(instruction);        
+        }
+
     }
 
     pub fn power_up(&mut self) {
@@ -239,6 +236,50 @@ impl Cpu {
         self.bus.store(0xFF4A, 0x00);
         self.bus.store(0xFF4B, 0x00);
         self.bus.store(0xFFFF, 0x00);
+    }
+
+    fn decode_callback(&mut self, instruction: u8) {
+        let nn = (self.bus.load(self.current_pc + 2) as u16) << 8
+            | self.bus.load(self.current_pc + 1) as u16;
+        let n = self.bus.load(self.current_pc + 1);
+
+        match instruction {
+            0x80 => {
+                self.register.b = self.register.b & !(1 << 0);
+                self.bus.add_to_clock(8);
+            }
+            0x81 => {
+                self.register.c = self.register.c & !(1 << 0);
+                self.bus.add_to_clock(8);
+            }
+            0x82 => {
+                self.register.d = self.register.d & !(1 << 0);
+                self.bus.add_to_clock(8);
+            }
+            0x83 => {
+                self.register.e = self.register.e & !(1 << 0);
+                self.bus.add_to_clock(8);
+            }
+            0x84 => {
+                self.register.h = self.register.h & !(1 << 0);
+                self.bus.add_to_clock(8);
+            }
+            0x85 => {
+                self.register.l = self.register.l & !(1 << 0);
+                self.bus.add_to_clock(8);
+            }
+            0x86 => {
+                let value = self.bus.load(self.register.hl());
+                self.bus.store(self.register.hl(), value & !(1 << 0));
+
+                self.bus.add_to_clock(16);
+            }
+            0x87 => {
+                self.register.a = self.register.a & !(1 << 0);
+                self.bus.add_to_clock(8);
+            }
+            _ => panic!("Unknown callback instruction {:#04x}", instruction),
+        }
     }
 
     fn decode(&mut self, instruction: u8) {
@@ -1882,7 +1923,7 @@ impl Cpu {
             }
             0xC4 => {
                 if self.register.flag.z == 0 {
-                    let addr = self.pc;
+                    let addr = self.current_pc + 2;
                     self.push_stack(addr);
                 }
                 self.pc = self.pc.wrapping_add(1);
@@ -1928,16 +1969,19 @@ impl Cpu {
                 self.pc = self.pc.wrapping_add(1);
                 self.bus.add_to_clock(12);
             }
+            0xCB => {
+                self.run_next_instruction(true);
+            }
             0xCC => {
                 if self.register.flag.z == 1 {
-                    let addr = self.pc;
+                    let addr = self.current_pc + 2;
                     self.push_stack(addr);
                 }
                 self.pc = self.pc.wrapping_add(1);
                 self.bus.add_to_clock(12);
             }
             0xCD => {
-                let addr = self.pc;
+                let addr = self.current_pc + 2;
                 self.push_stack(addr);
                 self.pc = nn;
                 self.bus.add_to_clock(12);
@@ -1986,7 +2030,7 @@ impl Cpu {
             }
             0xD4 => {
                 if self.register.flag.c == 0 {
-                    let addr = self.pc;
+                    let addr = self.current_pc + 2;
                     self.push_stack(addr);
                 }
                 self.pc = self.pc.wrapping_add(1);
@@ -2029,7 +2073,7 @@ impl Cpu {
             }
             0xDC => {
                 if self.register.flag.c == 1 {
-                    let addr = self.pc;
+                    let addr = self.current_pc + 2;
                     self.push_stack(addr);
                 }
                 self.pc = self.pc.wrapping_add(1);
