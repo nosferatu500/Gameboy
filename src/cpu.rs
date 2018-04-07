@@ -19,6 +19,8 @@ pub struct Cpu {
     log: bool,
 
     cartrige_type: u8,
+
+    halted: bool,
 }
 
 impl Cpu {
@@ -41,6 +43,8 @@ impl Cpu {
             log: false,
 
             cartrige_type: 0x00,
+
+            halted: false,
         }
     }
 
@@ -1064,6 +1068,10 @@ impl Cpu {
             0x75 => {
                 self.bus.store(self.register.hl(), self.register.l);
                 self.bus.add_to_clock(8);
+            }
+            0x76 => {
+                self.halted = true;
+                self.bus.add_to_clock(4);
             }
             0x77 => {
                 self.bus.store(self.register.hl(), self.register.a);

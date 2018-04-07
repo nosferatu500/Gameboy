@@ -33,9 +33,11 @@ mod map {
 
     pub const SWITCHABLE_RAM: Range = Range(0xA000, 0xBFFF);
 
-    pub const INTERNAL_RAM: Range = Range(0xC000, 0xDFFF);
+    pub const INTERNAL_RAM_BANK0: Range = Range(0xC000, 0xCFFF);
+    pub const INTERNAL_RAM_BANK1: Range = Range(0xD000, 0xDFFF);
 
-    pub const ECHO_INTERNAL_RAM: Range = Range(0xE000, 0xFDFF);
+    pub const ECHO_INTERNAL_RAM_BANK0: Range = Range(0xE000, 0xEFFF);
+    pub const ECHO_INTERNAL_RAM_BANK1: Range = Range(0xF000, 0xFDFF);
 
     pub const SPRITE_ATTRIB_MEMORY: Range = Range(0xFE00, 0xFE9F);
 
@@ -68,6 +70,7 @@ pub struct Bus {
     serial: Serial,
 
     hram: [u8; 0xFFFE - 0xFF80 + 0x1],
+    wram: [u8; 0xFDFF - 0xC000 + 0x1],
 }
 
 impl Bus {
@@ -91,6 +94,7 @@ impl Bus {
             serial: Serial::new(),
 
             hram: [0; 0xFFFE - 0xFF80 + 0x1],
+            wram: [0; 0xFDFF - 0xC000 + 0x1],
         }
     }
 
@@ -130,14 +134,20 @@ impl Bus {
             return self.mbc.readram(offset)
         }
 
-        if let Some(offset) = map::INTERNAL_RAM.contains(addr) {
-            panic!("load INTERNAL_RAM");
-            //return self.ram.load(offset);
+        if let Some(offset) = map::INTERNAL_RAM_BANK0.contains(addr) {
+            return self.wram[offset as usize & 0x0FFF];
         }
 
-        if let Some(offset) = map::ECHO_INTERNAL_RAM.contains(addr) {
-            panic!("load ECHO_INTERNAL_RAM");
-            //return self.ram.load(offset);
+        if let Some(offset) = map::INTERNAL_RAM_BANK1.contains(addr) {
+            return self.wram[offset as usize & 0x0FFF];
+        }
+
+        if let Some(offset) = map::ECHO_INTERNAL_RAM_BANK0.contains(addr) {
+            return self.wram[offset as usize & 0x0FFF];
+        }
+
+        if let Some(offset) = map::ECHO_INTERNAL_RAM_BANK1.contains(addr) {
+            return self.wram[offset as usize & 0x0FFF];
         }
 
         if let Some(offset) = map::HIGH_INTERNAL_RAM.contains(addr) {
@@ -716,16 +726,20 @@ impl Bus {
             }
         }
 
-        if let Some(offset) = map::ECHO_INTERNAL_RAM.contains(addr) {
-            panic!("store ECHO_INTERNAL_RAM");
-            // self.rom.store(offset - 0x2000, value); // internal
-            // return self.rom.store(offset, value); //echo
+        if let Some(offset) = map::INTERNAL_RAM_BANK0.contains(addr) {
+            return self.wram[offset as usize & 0x0FFF] = value;
         }
 
-        if let Some(offset) = map::INTERNAL_RAM.contains(addr) {
-            panic!("store INTERNAL_RAM");
-            // self.rom.store(offset + 0x2000, value); //echo
-            // return self.rom.store(offset, value); //internal
+        if let Some(offset) = map::INTERNAL_RAM_BANK1.contains(addr) {
+            return self.wram[0x1000 | offset as usize & 0x0FFF] = value;
+        }
+
+        if let Some(offset) = map::ECHO_INTERNAL_RAM_BANK0.contains(addr) {
+            return self.wram[offset as usize & 0x0FFF] = value;
+        }
+
+        if let Some(offset) = map::ECHO_INTERNAL_RAM_BANK1.contains(addr) {
+            return self.wram[0x1000 | offset as usize & 0x0FFF] = value;
         }
 
         if addr == 0xFFFF {
