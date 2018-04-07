@@ -257,6 +257,8 @@ impl Cpu {
                 self.register.flag.h = 0;
                 self.register.flag.c = 0;
 
+                self.update_register_f();
+
                 self.bus.add_to_clock(8);
             }
             0x31 => {
@@ -267,6 +269,8 @@ impl Cpu {
                 self.register.flag.n = 0;
                 self.register.flag.h = 0;
                 self.register.flag.c = 0;
+
+                self.update_register_f();
 
                 self.bus.add_to_clock(8);
             }
@@ -279,6 +283,8 @@ impl Cpu {
                 self.register.flag.h = 0;
                 self.register.flag.c = 0;
 
+                self.update_register_f();
+
                 self.bus.add_to_clock(8);
             }
             0x33 => {
@@ -289,6 +295,8 @@ impl Cpu {
                 self.register.flag.n = 0;
                 self.register.flag.h = 0;
                 self.register.flag.c = 0;
+
+                self.update_register_f();
 
                 self.bus.add_to_clock(8);
             }
@@ -301,6 +309,8 @@ impl Cpu {
                 self.register.flag.h = 0;
                 self.register.flag.c = 0;
 
+                self.update_register_f();
+                
                 self.bus.add_to_clock(8);
             }
             0x35 => {
@@ -323,6 +333,8 @@ impl Cpu {
                 self.register.flag.h = 0;
                 self.register.flag.c = 0;
 
+                self.update_register_f();
+
                 self.bus.add_to_clock(16);
             }
             0x37 => {
@@ -333,6 +345,8 @@ impl Cpu {
                 self.register.flag.n = 0;
                 self.register.flag.h = 0;
                 self.register.flag.c = 0;
+
+                self.update_register_f();
 
                 self.bus.add_to_clock(8);
             }
