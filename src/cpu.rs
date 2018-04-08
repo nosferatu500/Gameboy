@@ -372,24 +372,18 @@ impl Cpu {
             }
             0x09 => {
                 let value = self.bus.load(self.register.bc()) as u16;
-                let res = self.add(value, 8);
+                let res = self.add16(value, 8);
                 self.bus.store16(self.register.hl(), res);
             }
             0x0A => {
                 let value = self.bus.load(self.register.bc());
-
                 self.register.a = value;
-
                 self.bus.add_to_clock(8);
-
-                self.pc = self.pc.wrapping_add(2);
             }
             0x0B => {
                 let mut value = self.bus.load(self.register.bc());
                 value = value.wrapping_sub(1);
-
                 self.bus.store(self.register.bc(), value);
-
                 self.bus.add_to_clock(8);
             }
             0x0C => {
@@ -405,7 +399,6 @@ impl Cpu {
                 self.bus.add_to_clock(8);
             }
             0x0F => {
-                //TODO: Probably incorrect rotate_right value. Maybe we need use >> operator.
                 let old_bit = self.register.a & 0b1;
                 self.register.a = self.register.a.rotate_right(1);
 
@@ -429,7 +422,6 @@ impl Cpu {
             0x13 => {
                 let value = self.bus.load(self.register.de()).wrapping_add(1);
                 self.bus.store(self.register.de(), value);
-
                 self.bus.add_to_clock(8);
             }
             0x14 => {
@@ -446,24 +438,18 @@ impl Cpu {
             }
             0x19 => {
                 let value = self.bus.load(self.register.de()) as u16;
-                let res = self.add(value, 8);
+                let res = self.add16(value, 8);
                 self.bus.store16(self.register.hl(), res);
             }
             0x1A => {
                 let value = self.bus.load(self.register.de());
-
                 self.register.a = value;
-
                 self.bus.add_to_clock(8);
-
-                self.pc = self.pc.wrapping_add(2);
             }
             0x1B => {
                 let mut value = self.bus.load(self.register.de());
                 value = value.wrapping_sub(1);
-
                 self.bus.store(self.register.de(), value);
-
                 self.bus.add_to_clock(8);
             }
             0x1C => {
@@ -495,18 +481,15 @@ impl Cpu {
                 if self.register.flag.z == 0 {
                     self.pc = self.pc.wrapping_add((n as i8) as u16);
                 }
-                self.pc = self.pc.wrapping_add(1);
                 self.bus.add_to_clock(8);
             }
             0x21 => {
                 self.register.set_hl(nn);
                 self.bus.add_to_clock(12);
-                self.pc = self.pc.wrapping_add(2);
             }
             0x23 => {
                 let value = self.bus.load(self.register.hl()).wrapping_add(1);
                 self.bus.store(self.register.hl(), value);
-
                 self.bus.add_to_clock(8);
             }
             0x24 => {
@@ -523,22 +506,19 @@ impl Cpu {
             }
             0x28 => {
                 if self.register.flag.z == 1 {
-                    self.pc = self.pc.wrapping_add(n as u16);
+                    self.pc = self.pc.wrapping_add((n as i8) as u16);
                 }
-                self.pc = self.pc.wrapping_add(1);
                 self.bus.add_to_clock(8);
             }
             0x29 => {
                 let value = self.bus.load(self.register.hl()) as u16;
-                let res = self.add(value, 8);
+                let res = self.add16(value, 8);
                 self.bus.store16(self.register.hl(), res);
             }
             0x2B => {
                 let mut value = self.bus.load(self.register.hl());
                 value = value.wrapping_sub(1);
-
                 self.bus.store(self.register.hl(), value);
-
                 self.bus.add_to_clock(8);
             }
             0x2C => {
@@ -555,27 +535,23 @@ impl Cpu {
             }
             0x30 => {
                 if self.register.flag.c == 0 {
-                    self.pc = self.pc.wrapping_add(n as u16);
+                    self.pc = self.pc.wrapping_add((n as i8) as u16);
                 }
-                self.pc = self.pc.wrapping_add(1);
                 self.bus.add_to_clock(8);
             }
             0x31 => {
                 self.sp = nn;
                 self.bus.add_to_clock(12);
-                self.pc = self.pc.wrapping_add(2);
             }
             0x32 => {
                 let hl = self.register.hl();
                 self.bus.store(hl, self.register.a);
                 self.bus.add_to_clock(8);
-
                 self.register.set_hl(hl.wrapping_sub(1));
             }
             0x33 => {
                 let value = self.sp.wrapping_add(1);
                 self.bus.store16(self.sp, value);
-
                 self.bus.add_to_clock(8);
             }
             0x34 => {
@@ -595,22 +571,19 @@ impl Cpu {
             }
             0x38 => {
                 if self.register.flag.c == 1 {
-                    self.pc = self.pc.wrapping_add(n as u16);
+                    self.pc = self.pc.wrapping_add((n as i8) as u16);
                 }
-                self.pc = self.pc.wrapping_add(1);
                 self.bus.add_to_clock(8);
             }
             0x39 => {
                 let value = self.sp;
-                let res = self.add(value, 8);
+                let res = self.add16(value, 8);
                 self.bus.store16(self.register.hl(), res);
             }
             0x3A => {
                 let value = self.bus.load(self.register.hl());
                 self.register.a = value;
-
                 self.bus.store(self.register.hl(), value.wrapping_sub(1));
-
                 self.bus.add_to_clock(8);
             }
             0x3B => {
@@ -627,10 +600,7 @@ impl Cpu {
             }
             0x3E => {
                 self.register.a = n;
-
                 self.bus.add_to_clock(8);
-
-                self.pc = self.pc.wrapping_add(2);
             }
             0x40 => {
                 self.bus.add_to_clock(4);
@@ -853,144 +823,65 @@ impl Cpu {
             0x78 => {
                 self.register.a = self.register.b;
                 self.bus.add_to_clock(4);
-                self.pc = self.pc.wrapping_add(2);
             }
             0x79 => {
                 self.register.a = self.register.c;
                 self.bus.add_to_clock(4);
-                self.pc = self.pc.wrapping_add(2);
             }
             0x7A => {
                 self.register.a = self.register.d;
                 self.bus.add_to_clock(4);
-                self.pc = self.pc.wrapping_add(2);
             }
             0x7B => {
                 self.register.a = self.register.e;
                 self.bus.add_to_clock(4);
-                self.pc = self.pc.wrapping_add(2);
             }
             0x7C => {
                 self.register.a = self.register.h;
                 self.bus.add_to_clock(4);
-                self.pc = self.pc.wrapping_add(2);
             }
             0x7D => {
                 self.register.a = self.register.l;
                 self.bus.add_to_clock(4);
-                self.pc = self.pc.wrapping_add(2);
             }
             0x7E => {
                 self.register.a = self.bus.load(self.register.hl());
                 self.bus.add_to_clock(8);
-                self.pc = self.pc.wrapping_add(2);
             }
             0x7F => {
                 self.bus.add_to_clock(4);
             }
             0x80 => {
-                let old_value = self.register.a;
-                self.register.a = self.register.a.wrapping_add(self.register.b);
-
-                self.register.flag.z = (self.register.a == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = ((old_value & 0x7) + 1 > 0x7) as u8;
-                self.register.flag.c = ((old_value & 0x7F) + 1 > 0x7F) as u8;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(4);
+                let value = self.register.b;
+                self.add8(value, 4);
             }
             0x81 => {
-                let old_value = self.register.a;
-                self.register.a = self.register.a.wrapping_add(self.register.c);
-
-                self.register.flag.z = (self.register.a == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = ((old_value & 0x7) + 1 > 0x7) as u8;
-                self.register.flag.c = ((old_value & 0x7F) + 1 > 0x7F) as u8;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(4);
+                let value = self.register.c;
+                self.add8(value, 4);
             }
             0x82 => {
-                let old_value = self.register.a;
-                self.register.a = self.register.a.wrapping_add(self.register.d);
-
-                self.register.flag.z = (self.register.a == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = ((old_value & 0x7) + 1 > 0x7) as u8;
-                self.register.flag.c = ((old_value & 0x7F) + 1 > 0x7F) as u8;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(4);
+                let value = self.register.d;
+                self.add8(value, 4);
             }
             0x83 => {
-                let old_value = self.register.a;
-                self.register.a = self.register.a.wrapping_add(self.register.e);
-
-                self.register.flag.z = (self.register.a == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = ((old_value & 0x7) + 1 > 0x7) as u8;
-                self.register.flag.c = ((old_value & 0x7F) + 1 > 0x7F) as u8;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(4);
+                let value = self.register.e;
+                self.add8(value, 4);
             }
             0x84 => {
-                let old_value = self.register.a;
-                self.register.a = self.register.a.wrapping_add(self.register.h);
-
-                self.register.flag.z = (self.register.a == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = ((old_value & 0x7) + 1 > 0x7) as u8;
-                self.register.flag.c = ((old_value & 0x7F) + 1 > 0x7F) as u8;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(4);
+                let value = self.register.h;
+                self.add8(value, 4);
             }
             0x85 => {
-                let old_value = self.register.a;
-                self.register.a = old_value.wrapping_add(self.register.l);
-
-                self.register.flag.z = (self.register.a == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = ((old_value & 0x7) + 1 > 0x7) as u8;
-                self.register.flag.c = ((old_value & 0x7F) + 1 > 0x7F) as u8;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(4);
+                let value = self.register.l;
+                self.add8(value, 4);
             }
             0x86 => {
-                let old_value = self.register.a;
-                self.register.a = old_value.wrapping_add(self.bus.load(self.register.hl()));
-
-                self.register.flag.z = (self.register.a == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = ((old_value & 0x7) + 1 > 0x7) as u8;
-                self.register.flag.c = ((old_value & 0x7F) + 1 > 0x7F) as u8;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(8);
+                let value = self.bus.load(self.register.hl());
+                self.add8(value, 8);
             }
             0x87 => {
-                let old_value = self.register.a;
-                self.register.a = old_value.wrapping_add(self.register.a);
-
-                self.register.flag.z = (self.register.a == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = ((old_value & 0x7) + 1 > 0x7) as u8;
-                self.register.flag.c = ((old_value & 0x7F) + 1 > 0x7F) as u8;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(4);
+                let value = self.register.a;
+                self.add8(value, 4);
             }
             0x88 => {
                 let old_value = self.register.a;
@@ -1799,17 +1690,8 @@ impl Cpu {
                 self.bus.add_to_clock(12);
             }
             0xC6 => {
-                let old_value = self.register.a;
-                self.register.a = old_value.wrapping_add(n);
-
-                self.register.flag.z = (self.register.a == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = ((old_value & 0x7) + 1 > 0x7) as u8;
-                self.register.flag.c = ((old_value & 0x7F) + 1 > 0x7F) as u8;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(8);
+                let value = n;
+                self.add8(value, 8);
             }
             0xC7 => {
                 let value = self.current_pc;
@@ -2076,11 +1958,8 @@ impl Cpu {
             }
             0xFA => {
                 let value = self.bus.load(nn);
-
                 self.register.a = value;
-
                 self.bus.add_to_clock(16);
-                self.pc = self.pc.wrapping_add(2);
             }
             0xFE => {
                 let value = n;
@@ -2157,7 +2036,21 @@ impl Cpu {
         res
     }
 
-    fn add(&mut self, param: u16, clock: u16) -> u16 {
+    fn add8(&mut self, param: u8, clock: u16) {
+        let old_value = self.register.a;
+        self.register.a = self.register.a.wrapping_add(param);
+
+        self.register.flag.z = (self.register.a == 0) as u8;
+        self.register.flag.n = 0;
+        self.register.flag.h = ((old_value & 0x7) + 1 > 0x7) as u8;
+        self.register.flag.c = ((old_value & 0x7F) + 1 > 0x7F) as u8;
+
+        self.update_register_f();
+
+        self.bus.add_to_clock(clock);
+    }
+
+    fn add16(&mut self, param: u16, clock: u16) -> u16 {
         let hl = self.bus.load(self.register.hl()) as u16;
         let res = hl.wrapping_add(param);
 
