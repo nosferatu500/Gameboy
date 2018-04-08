@@ -250,105 +250,37 @@ impl Cpu {
         match instruction {
             0x30 => {
                 let value = self.register.b;
-                self.register.b = (value >> 4) | (value << 4);
-
-                self.register.flag.z = (value == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = 0;
-                self.register.flag.c = 0;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(8);
+                self.register.b = self.swap(value, 8);
             }
             0x31 => {
                 let value = self.register.c;
-                self.register.c = (value >> 4) | (value << 4);
-
-                self.register.flag.z = (value == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = 0;
-                self.register.flag.c = 0;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(8);
+                self.register.c = self.swap(value, 8);
             }
             0x32 => {
                 let value = self.register.d;
-                self.register.d = (value >> 4) | (value << 4);
-
-                self.register.flag.z = (value == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = 0;
-                self.register.flag.c = 0;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(8);
+                self.register.d = self.swap(value, 8);
             }
             0x33 => {
                 let value = self.register.e;
-                self.register.e = (value >> 4) | (value << 4);
-
-                self.register.flag.z = (value == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = 0;
-                self.register.flag.c = 0;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(8);
+                self.register.e = self.swap(value, 8);
             }
             0x34 => {
                 let value = self.register.h;
-                self.register.h = (value >> 4) | (value << 4);
-
-                self.register.flag.z = (value == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = 0;
-                self.register.flag.c = 0;
-
-                self.update_register_f();
-                
-                self.bus.add_to_clock(8);
+                self.register.h = self.swap(value, 8);
             }
             0x35 => {
                 let value = self.register.l;
-                self.register.l = (value >> 4) | (value << 4);
-
-                self.register.flag.z = (value == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = 0;
-                self.register.flag.c = 0;
-
-                self.bus.add_to_clock(8);
+                self.register.l = self.swap(value, 8);
             }
             0x36 => {
                 let value = self.bus.load(self.register.hl());
-                self.bus.store(self.register.hl(), (value >> 4) | (value << 4));
+                let res = self.swap(value, 16);
 
-                self.register.flag.z = (value == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = 0;
-                self.register.flag.c = 0;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(16);
+                self.bus.store(self.register.hl(), res);
             }
             0x37 => {
                 let value = self.register.a;
-                self.register.a = (value >> 4) | (value << 4);
-
-                self.register.flag.z = (value == 0) as u8;
-                self.register.flag.n = 0;
-                self.register.flag.h = 0;
-                self.register.flag.c = 0;
-
-                self.update_register_f();
-
-                self.bus.add_to_clock(8);
+                self.register.a = self.swap(value, 8);
             }
             0x80 => {
                 self.register.b = self.register.b & !(1 << 0);
@@ -2353,5 +2285,20 @@ impl Cpu {
                 panic!("Unknown instruction {:#04x}", instruction);
             }
         }
+    }
+
+    fn swap(&mut self, param: u8, clock: u16) -> u8 {
+        let res = (param >> 4) | (param << 4);
+
+        self.register.flag.z = (param == 0) as u8;
+        self.register.flag.n = 0;
+        self.register.flag.h = 0;
+        self.register.flag.c = 0;
+
+        self.update_register_f();
+
+        self.bus.add_to_clock(clock);
+
+        res
     }
 }
