@@ -411,6 +411,9 @@ impl Cpu {
 
                 self.bus.add_to_clock(4);
             }
+            0x10 => {
+                self.bus.add_to_clock(4);
+            }
             0x11 => {
                 self.register.set_de(nn);
                 self.bus.add_to_clock(12);
@@ -434,6 +437,24 @@ impl Cpu {
             }
             0x16 => {
                 self.register.d = n;
+                self.bus.add_to_clock(8);
+            }
+            0x17 => {
+                // TODO: Probably incorrect.
+                let old_bit = (self.register.a >> 7) & 0b1;
+                self.register.a = self.register.a.rotate_left(self.register.flag.c as u32);
+
+                self.register.flag.z = (self.register.a == 0) as u8;
+                self.register.flag.n = 0;
+                self.register.flag.h = 0;
+                self.register.flag.c = old_bit;
+
+                self.update_register_f();
+
+                self.bus.add_to_clock(4);
+            }
+            0x18 => {
+                self.pc = self.pc.wrapping_add(n as u16);
                 self.bus.add_to_clock(8);
             }
             0x19 => {

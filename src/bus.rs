@@ -373,7 +373,7 @@ impl Bus {
 
     pub fn store(&mut self, addr: u16, value: u8) {
         if let Some(offset) = map::ROM.contains(addr) {
-            println!("Unexpected writing to ROM: addr: {:x} value: {:x}", offset, value);
+            return self.mbc.writerom(offset, value);
         }
 
         if let Some(offset) = map::VIDEO_RAM.contains(addr) {
