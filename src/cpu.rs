@@ -371,9 +371,9 @@ impl Cpu {
                 self.bus.add_to_clock(20);
             }
             0x09 => {
-                let value = self.bus.load(self.register.bc());
+                let value = self.bus.load(self.register.bc()) as u16;
                 let res = self.add(value, 8);
-                self.bus.store(self.register.hl(), res);
+                self.bus.store16(self.register.hl(), res);
             }
             0x0A => {
                 let value = self.bus.load(self.register.bc());
@@ -445,9 +445,9 @@ impl Cpu {
                 self.bus.add_to_clock(8);
             }
             0x19 => {
-                let value = self.bus.load(self.register.de());
+                let value = self.bus.load(self.register.de()) as u16;
                 let res = self.add(value, 8);
-                self.bus.store(self.register.hl(), res);
+                self.bus.store16(self.register.hl(), res);
             }
             0x1A => {
                 let value = self.bus.load(self.register.de());
@@ -529,9 +529,9 @@ impl Cpu {
                 self.bus.add_to_clock(8);
             }
             0x29 => {
-                let value = self.bus.load(self.register.hl());
+                let value = self.bus.load(self.register.hl()) as u16;
                 let res = self.add(value, 8);
-                self.bus.store(self.register.hl(), res);
+                self.bus.store16(self.register.hl(), res);
             }
             0x2B => {
                 let mut value = self.bus.load(self.register.hl());
@@ -603,7 +603,7 @@ impl Cpu {
             0x39 => {
                 let value = self.sp;
                 let res = self.add(value, 8);
-                self.bus.store(self.register.hl(), res);
+                self.bus.store16(self.register.hl(), res);
             }
             0x3A => {
                 let value = self.bus.load(self.register.hl());
@@ -2157,8 +2157,8 @@ impl Cpu {
         res
     }
 
-    fn add(&mut self, param: u8, clock: u16) -> u8 {
-        let hl = self.bus.load(self.register.hl());
+    fn add(&mut self, param: u16, clock: u16) -> u16 {
+        let hl = self.bus.load(self.register.hl()) as u16;
         let res = hl.wrapping_add(param);
 
         self.register.flag.n = 0;
