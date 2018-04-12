@@ -33,7 +33,8 @@ impl MBC for MBC1 {
         if address < 0x4000 {
             self.rom[address as usize] 
         } else {
-            panic!("unimplemented read rom");
+            let addr = self.rom_bank * 0x4000 | ((address as usize) & 0x3FFF);
+            self.rom[addr as usize]
         }
     }
 
@@ -53,13 +54,21 @@ impl MBC for MBC1 {
         if !self.ram_on {
             return 0;
         }
-        panic!("unimplemented read ram");
+        if self.ram_mode { 
+            self.ram[(self.ram_bank * 0x2000) | ((address & 0x1FFF) as usize)]
+        } else { 
+            self.ram[(address & 0x1FFF) as usize]
+        }
      }
 
     fn writeram(&mut self, address: u16, value: u8) { 
         if !self.ram_on {
             return;
         }
-        panic!("unimplemented write ram");
+        if self.ram_mode { 
+            self.ram[(self.ram_bank * 0x2000) | ((address & 0x1FFF) as usize)] = value;
+        } else { 
+            self.ram[(address & 0x1FFF) as usize] = value;
+        }
     }
 }

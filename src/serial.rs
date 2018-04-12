@@ -1,4 +1,4 @@
-const EXTURNAL_CLOCK: u32 = 500 * 1024;
+const EXTERNAL_CLOCK: u32 = 500 * 1024;
 const INTERNAL_CLOCK: u32 = 8192;
 
 pub struct Serial {

@@ -102,6 +102,10 @@ impl Bus {
         self.clock.counter = self.clock.counter.wrapping_add(value);
     }
 
+    pub fn get_banks_count(&self, value: u8) -> u32 {
+        ::mbc::bank_count(value)
+    }
+
     pub fn load(&self, addr: u16) -> u8 {
         if let Some(offset) = map::ROM.contains(addr) {
             return self.mbc.readrom(offset)
@@ -396,7 +400,7 @@ impl Bus {
         }
 
         if let Some(offset) = map::SWITCHABLE_ROM.contains(addr) {
-            println!("Unexpected writing to SWITCHABLE_ROM: addr: {:x} value: {:x}", offset, value);
+            return self.mbc.writerom(offset, value);
         }
 
         if let Some(offset) = map::IO.contains(addr) {
@@ -681,6 +685,11 @@ impl Bus {
                 }
                 0xFF43 => {
                     self.gui.scroll_x = value;
+                    return;
+                }
+                0xFF44 => {
+                    // Probably must be unreachable.
+                    self.gui.line = value;
                     return;
                 }
                 0xFF45 => {

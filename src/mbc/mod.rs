@@ -101,3 +101,7 @@ fn check_checksum(data: &[u8]) -> ::StrResult<()> {
         false => Err("Cartridge checksum is invalid"),
     }
 }
+
+pub fn bank_count(value: u8) -> u32 {
+    rom_size(value) as u32 / (1024 * 16)
+}

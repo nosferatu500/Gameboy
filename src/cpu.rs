@@ -180,10 +180,14 @@ impl Cpu {
           println!("| TYPE 0147 |: {:#06X}", self.bus.load(0x0147));
           println!(" ");
 
-          println!("| ROM 0148 |: {:#06X}", self.bus.load(0x0148));
+          let rom_size = self.bus.load(0x0148);
+          println!("| ROM 0148 |: {:#06X}", rom_size);
           println!(" ");
 
           println!("| RAM 0149 |: {:#06X}", self.bus.load(0x0149));
+          println!(" ");
+
+          println!("| BANKS |: {}", self.bus.get_banks_count(rom_size));
           println!(" ");
           println!("***********************************");
         }
@@ -525,6 +529,16 @@ impl Cpu {
                 self.register.h = n;
                 self.bus.add_to_clock(8);
             }
+            0x27 => {
+                // TODO: Probaly incorrect.
+                self.register.flag.z = (self.register.a == 0) as u8;
+                self.register.flag.h = 0;
+                self.register.flag.c = (self.register.a == 1) as u8;;
+
+                self.update_register_f();
+
+                self.bus.add_to_clock(4);
+            }
             0x28 => {
                 if self.register.flag.z == 1 {
                     self.pc = self.pc.wrapping_add((n as i8) as u16);
@@ -535,6 +549,14 @@ impl Cpu {
                 let value = self.bus.load(self.register.hl()) as u16;
                 let res = self.add16(value, 8);
                 self.bus.store16(self.register.hl(), res);
+            }
+            0x2A => {
+                let mut value = self.bus.load(self.register.hl());
+                self.register.a = value;
+
+                value = value.wrapping_add(1);
+                self.bus.store(self.register.hl(), value);
+                self.bus.add_to_clock(8);
             }
             0x2B => {
                 let mut value = self.bus.load(self.register.hl());
@@ -1633,6 +1655,10 @@ impl Cpu {
                 let value = self.bus.load(nn);
                 self.register.a = value;
                 self.bus.add_to_clock(16);
+            }
+            0xFB => {
+                self.ei = 2; //Execute after after instruction (jump through 2);
+                self.bus.add_to_clock(4);
             }
             0xFE => {
                 let value = n;
