@@ -417,6 +417,10 @@ impl Bus {
 
         if let Some(offset) = map::IO.contains(addr) {
             match addr {
+                0xFF00 => {
+                    //TODO: Implement Joypad interrupt.
+                    return;
+                }
                 0xFF01 => {
                     return self.serial.data = value;
                 }
@@ -447,7 +451,7 @@ impl Bus {
                     return self.clock.divider = value;
                 }
                 0xFF07 => {
-                    let status = value & 0b111 == 1;
+                    let status = ((value & 0b100) >> 2) == 1;
                     self.clock.enabled = status;
                     self.clock.mode = match value & 0b11 {
                         0b00 => 4096,
