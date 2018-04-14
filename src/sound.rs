@@ -23,6 +23,8 @@ pub struct Sound {
     pub ratio: u32,
 
     pub data: [u8; 32],
+
+    pub waveram: [u8; 32],
 }
 
 impl Sound {
@@ -52,6 +54,8 @@ impl Sound {
             ratio: 0,
 
             data: [0; 32],
+
+            waveram: [0; 32],
         }
     }
 }

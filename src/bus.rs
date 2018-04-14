@@ -380,6 +380,14 @@ impl Bus {
             return self.mbc.writerom(offset, value);
         }
 
+        if let Some(offset) = map::NOT_USABLE_1.contains(addr) {
+            return;
+        }
+
+        if let Some(offset) = map::NOT_USABLE_2.contains(addr) {
+            return;
+        }
+
         if let Some(offset) = map::VIDEO_RAM.contains(addr) {
             
             if let Some(offset) = map::CHARACTER_DATA.contains(addr) {
@@ -401,6 +409,10 @@ impl Bus {
 
         if let Some(offset) = map::SWITCHABLE_ROM.contains(addr) {
             return self.mbc.writerom(offset, value);
+        }
+
+        if let Some(offset) = map::SPRITE_ATTRIB_MEMORY.contains(addr) {
+            return self.gui.store_sprite(offset, value);
         }
 
         if let Some(offset) = map::IO.contains(addr) {
@@ -435,15 +447,18 @@ impl Bus {
                     return self.clock.divider = value;
                 }
                 0xFF07 => {
-                    let status = value & 0x4 == 1;
+                    let status = value & 0b111 == 1;
                     self.clock.enabled = status;
-                    self.clock.mode = match value {
-                        0x00 => 4096,
-                        0x01 => 262144,
-                        0x10 => 65536,
-                        0x11 => 16384,
+                    self.clock.mode = match value & 0b11 {
+                        0b00 => 4096,
+                        0b01 => 262144,
+                        0b10 => 65536,
+                        0b11 => 16384,
                         _ => unreachable!(),
                     };
+                    return;
+                }
+                0xFF08 ... 0xFF0E => {
                     return;
                 }
                 0xFF0F => {
@@ -495,11 +510,21 @@ impl Bus {
 
                     return;
                 }
+                0xFF13 => {
+                    // TODO:
+                    // FF13 - NR13 - Channel 1 Frequency lo (Write Only)
+                    // Lower 8 bits of 11 bit frequency (x).
+                    // Next 3 bit are in NR14 ($FF14)
+                    return;
+                }
                 0xFF14 => {
                     self.sound_channel_1.initial = (value >> 7) & 0b1;
                     self.sound_channel_1.counter = (value >> 6) & 0b1;
                     self.sound_channel_1.frequency = value & 0b111;
 
+                    return;
+                }
+                0xFF15 => {
                     return;
                 }
                 0xFF16 => {
@@ -523,6 +548,13 @@ impl Bus {
                     self.sound_channel_2.direction = (value >> 3) & 0b1 == 1;
                     self.sound_channel_2.sweeps = value & 0x4;
 
+                    return;
+                }
+                0xFF18 => {
+                    // TODO:
+                    // FF18 - NR23 - Channel 2 Frequency lo data (W)
+                    // Frequency's lower 8 bits of 11 bit data (x).
+                    // Next 3 bits are in NR24 ($FF19).
                     return;
                 }
                 0xFF19 => {
@@ -554,11 +586,20 @@ impl Bus {
 
                     return;
                 }
+                0xFF1D => {
+                    // TODO:
+                    // FF1D - NR33 - Channel 3 Frequency's lower data (W)
+                    // Lower 8 bits of an 11 bit frequency (x).
+                    return;
+                }
                 0xFF1E => {
                     self.sound_channel_3.initial = (value >> 7) & 0b1;
                     self.sound_channel_3.counter = (value >> 6) & 0b1;
                     self.sound_channel_3.frequency = value & 0b111;
 
+                    return;
+                }
+                0xFF1F => {
                     return;
                 }
                 0xFF20 => {
@@ -628,6 +669,14 @@ impl Bus {
 
                     return;
                 }
+                0xFF27 ... 0xFF2F => {
+                    return;
+                }
+                0xFF30 ... 0xFF3F => {
+                    self.sound_channel_3.waveram[(addr as usize - 0xFF30) / 2] = value >> 4;
+                    self.sound_channel_3.waveram[((addr as usize - 0xFF30) / 2) + 1] = value & 0xF;
+                    return;
+                },
                 0xFF40 => {
                     self.gui.lcd_display = (value >> 7) & 0b1 == 1;
 
@@ -694,6 +743,14 @@ impl Bus {
                 }
                 0xFF45 => {
                     self.gui.lyc = value;
+                    return;
+                }
+                0xFF46 => {
+                    let base = (value as u16) << 8;
+                    for i in 0 .. 0xA0 {
+                        let b = self.load(base + i);
+                        self.store(0xFE00 + i, b);
+                    }
                     return;
                 }
                 0xFF47 => {
